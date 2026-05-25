@@ -1,0 +1,59 @@
+<!--pages/index/index.wxml-->
+<view class="container">
+  <!-- 顶部欢迎区 -->
+  <view class="header">
+    <view class="greeting">
+      <text class="title">找到你的旅伴</text>
+      <text class="subtitle">一起探索世界的美好</text>
+    </view>
+    <view class="avatar-wrapper" bindtap="goToProfile">
+      <view class="avatar">
+        <text wx:if="{{userInfo && userInfo.name}}">{{userInfo.name.substring(0, 1)}}</text>
+        <text wx:else>我</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快速操作 -->
+  <view class="quick-actions card">
+    <view class="action-item" bindtap="startMatch">
+      <view class="action-icon">🔍</view>
+      <text class="action-text">智能匹配</text>
+    </view>
+    <view class="action-item">
+      <view class="action-icon">🗓️</view>
+      <text class="action-text">我的行程</text>
+    </view>
+    <view class="action-item">
+      <view class="action-icon">💬</view>
+      <text class="action-text">聊天</text>
+    </view>
+  </view>
+
+  <!-- 推荐旅伴 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">为你推荐</text>
+      <text class="section-more">查看更多</text>
+    </view>
+
+    <view class="recommendations">
+      <view class="travel-mate-card" wx:for="{{recommendations}}" wx:key="id" bindtap="viewTravelMate" data-id="{{item.id}}">
+        <view class="mate-avatar">
+          <text>{{item.name.substring(0, 1)}}</text>
+        </view>
+        <view class="mate-info">
+          <view class="mate-header">
+            <text class="mate-name">{{item.name}} · {{item.age}}</text>
+            <view class="match-rate">{{item.matchRate}}%匹配</view>
+          </view>
+          <view class="mate-destination">📍 {{item.destination}}</view>
+          <view class="mate-date">📅 {{item.travelDate}}</view>
+          <view class="mate-tags">
+            <view class="tag" wx:for="{{item.tags}}" wx:key="*this" wx:for-item="tag">{{tag}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

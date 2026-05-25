@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>搭伴游 - 马卡龙卡通风格</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  :root {
+    /* 马卡龙色系 */
+    --mint: #B8E6D0;
+    --lavender: #C5B8E6;
+    --peach: #FFB8A3;
+    --butter: #FFE0A3;
+    --sky: #A3CFFF;
+    --rose: #FFB8C6;
+    --lemon: #FFF3A3;
+    
+    --bg: #F8F5FF;
+    --card-bg: #FFFFFF;
+    --text-primary: #3D3557;
+    --text-secondary: #7B7399;
+    --text-light: #B8B0CC;
+    
+    --gradient-primary: linear-gradient(135deg, #C5B8E6, #A3CFFF);
+    --gradient-warm: linear-gradient(135deg, #FFB8A3, #FFE0A3);
+    --gradient-fresh: linear-gradient(135deg, #B8E6D0, #A3CFFF);
+    
+    --shadow: 0 4px 20px rgba(61, 53, 87, 0.08);
+    --shadow-hover: 0 6px 24px rgba(61, 53, 87, 0.12);
+  }
+  
+  body {
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding-bottom: 70px;
+  }
+
+  /* 顶部导航 */
+  .header {
+    background: var(--gradient-primary);
+    color: white;
+    padding: 20px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .header .location { display: flex; align-items: center; gap: 6px; }
+  .header .location .icon { font-size: 18px; }
+  .header .location .city { font-size: 16px; font-weight: 600; }
+  .header .actions { display: flex; gap: 16px; font-size: 20px; }
+
+  /* 欢迎回来区域 */
+  .welcome-back {
+    padding: 20px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card-bg);
+    border-radius: 0 0 24px 24px;
+    box-shadow: var(--shadow);
+  }
+  .welcome-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid var(--lavender);
+    object-fit: cover;
+  }
+  .welcome-text h3 {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+  .welcome-text p {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  /* 心情选择器 */
+  .mood-section {
+    margin: 16px;
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  .mood-title {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+  }
+  .mood-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .mood-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 8px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    border: 2px solid transparent;
+  }
+  .mood-item:hover { transform: translateY(-2px); }
+  .mood-item.active { border-color: var(--lavender); background: rgba(197, 184, 230, 0.15); }
+  .mood-icon { font-size: 28px; }
+  .mood-label { font-size: 12px; color: var(--text-secondary); }
+
+  /* 数据卡片 */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 0 16px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  .stat-card.sleep { border-left: 4px solid var(--peach); }
+  .stat-card.stress { border-left: 4px solid var(--lavender); }
+  .stat-card h4 {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    font-weight: 400;
+  }
+  .stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .stat-chart {
+    height: 40px;
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    margin-top: 8px;
+  }
+  .bar {
+    flex: 1;
+    border-radius: 4px 4px 0 0;
+    background: var(--lavender);
+  }
+  .stat-card.sleep .bar { background: var(--peach); }
+
+  /* 搭子卡片 */
+  .section-title {
+    padding: 0 16px;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .buddy-list { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 16px; }
+  .buddy-card {
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .buddy-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+  }
+  .buddy-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-warm);
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    font-size: 12px;
+  }
+  .card-header .distance { color: var(--text-light); }
+  .card-header .match { 
+    color: #FF8A80;
+    font-weight: 600;
+    background: rgba(255, 138, 128, 0.15);
+    padding: 2px 10px;
+    border-radius: 12px;
+  }
+  .card-main {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .avatar-wrapper { position: relative; margin-right: 12px; }
+  .avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 3px solid var(--lavender);
+    object-fit: cover;
+  }
+  .verified {
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+    width: 22px;
+    height: 22px;
+    background: var(--mint);
+    color: #4CAF50;
+    font-size: 11px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+  .info { flex: 1; }
+  .name-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .nickname { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+  .age { font-size: 12px; color: var(--text-secondary); }
+  .gender { font-size: 12px; }
+  .gender.male { color: #7B9FFF; }
+  .gender.female { color: #FF8A80; }
+  .signature { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
+  
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .tag {
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .tag-mint { background: rgba(184, 230, 208, 0.4); color: #66BB6A; }
+  .tag-lavender { background: rgba(197, 184, 230, 0.4); color: #9575CD; }
+  .tag-peach { background: rgba(255, 184, 163, 0.4); color: #FF8A65; }
+  .tag-sky { background: rgba(163, 207, 255, 0.4); color: #64B5F6; }
+  .tag-rose { background: rgba(255, 184, 198, 0.4); color: #F48FB1; }
+  .tag-butter { background: rgba(255, 224, 163, 0.4); color: #FFB74D; }
+  
+  .card-actions { display: flex; justify-content: space-around; padding-top: 16px; border-top: 1px dashed var(--text-light); }
+  .action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 20px;
+    border-radius: 16px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-pass { color: var(--text-light); }
+  .btn-pass:hover { background: rgba(0,0,0,0.05); }
+  .btn-like { color: #FF8A80; }
+  .btn-like:hover { background: rgba(255, 138, 128, 0.15); }
+  .btn-sayhi { color: #9575CD; background: rgba(197, 184, 230, 0.2); }
+  .btn-sayhi:hover { background: rgba(197, 184, 230, 0.3); }
+  .btn-icon { font-size: 20px; }
+
+  /* 筛选栏 */
+  .filter-bar {
+    display: flex;
+    gap: 10px;
+    padding: 12px 16px;
+    overflow-x: auto;
+    background: var(--card-bg);
+    white-space: nowrap;
+  }
+  .filter-bar::-webkit-scrollbar { display: none; }
+  .filter-item {
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    background: rgba(197, 184, 230, 0.15);
+    color: var(--text-secondary);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .filter-item:hover { background: rgba(197, 184, 230, 0.25); }
+  .filter-item.active {
+    background: var(--gradient-primary);
+    color: white;
+  }
+
+  /* TabBar */
+  .tabbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    background: var(--card-bg);
+    border-top: 1px solid rgba(197, 184, 230, 0.3);
+    padding: 10px 0;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+  }
+  .tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 10px;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .tab-item.active { color: #9575CD; }
+  .tab-item .tab-icon { font-size: 24px; }
+
+  /* 页面切换 */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* 行程页 */
+  .trip-tabs { display: flex; background: var(--card-bg); padding: 12px 0; border-radius: 0 0 20px 20px; }
+  .trip-tab { flex: 1; text-align: center; padding: 10px; font-size: 14px; color: var(--text-secondary); border-bottom: 2px solid transparent; cursor: pointer; }
+  .trip-tab.active { color: #9575CD; border-bottom-color: #9575CD; font-weight: 600; }
+  .trip-list { padding: 16px; }
+  .trip-card {
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 20px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .trip-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-fresh);
+  }
+  .trip-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .trip-title { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+  .status-tag { 
+    padding: 4px 12px; 
+    border-radius: 16px; 
+    font-size: 11px; 
+    background: rgba(184, 230, 208, 0.4); 
+    color: #66BB6A;
+    font-weight: 500;
+  }
+  .trip-route { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; }
+  .trip-route .arrow { color: #9575CD; margin: 0 10px; }
+  .trip-meta { display: flex; gap: 16px; margin-bottom: 16px; }
+  .meta-item { font-size: 12px; color: var(--text-light); }
+  .trip-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px dashed var(--text-light); }
+  .author-info { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .author-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--lavender); }
+  .join-btn { padding: 10px 24px; background: var(--gradient-primary); color: white; border-radius: 20px; font-size: 13px; font-weight: 500; }
+
+  /* 消息页 */
+  .chat-list { padding: 16px; }
+  .chat-item {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background: var(--card-bg);
+    border-radius: 20px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s;
+  }
+  .chat-item:hover { transform: translateY(-2px); }
+  .chat-item .avatar-wrap { position: relative; margin-right: 12px; }
+  .chat-item .avatar { width: 56px; height: 56px; border-radius: 50%; border: 3px solid var(--lavender); }
+  .unread-badge { position: absolute; top: -6px; right: -6px; background: #FF8A80; color: white; font-size: 10px; padding: 3px 8px; border-radius: 12px; font-weight: 600; }
+  .chat-info { flex: 1; }
+  .chat-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+  .chat-name { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+  .chat-time { font-size: 11px; color: var(--text-light); }
+  .last-msg { font-size: 13px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 260px; }
+
+  /* 我的 */
+  .profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 16px 24px;
+    background: var(--gradient-primary);
+    color: white;
+    border-radius: 0 0 30px 30px;
+  }
+  .profile-header .avatar { width: 80px; height: 80px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.5); margin-bottom: 12px; }
+  .profile-header .nickname { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .profile-header .city { font-size: 13px; opacity: 0.9; }
+  
+  .credit-card { 
+    margin: -20px 16px 16px; 
+    background: var(--card-bg); 
+    border-radius: 20px; 
+    padding: 16px; 
+    box-shadow: var(--shadow);
+  }
+  .credit-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .credit-label { font-size: 14px; color: var(--text-secondary); }
+  .credit-score { font-size: 24px; font-weight: 700; color: #9575CD; }
+  .credit-bar { height: 8px; background: rgba(197, 184, 230, 0.2); border-radius: 4px; overflow: hidden; }
+  .credit-fill { height: 100%; background: var(--gradient-primary); border-radius: 4px; width: 60%; }
+  
+  .menu-section { background: var(--card-bg); border-radius: 20px; margin: 0 16px 16px; padding: 0 16px; box-shadow: var(--shadow); }
+  .menu-item { display: flex; align-items: center; padding: 14px 0; border-bottom: 1px solid rgba(197, 184, 230, 0.2); }
+  .menu-item:last-child { border-bottom: none; }
+  .menu-icon { font-size: 20px; margin-right: 12px; }
+  .menu-text { flex: 1; font-size: 14px; color: var(--text-primary); }
+  .menu-arrow { color: var(--text-light); font-size: 12px; }
+
+  /* 发现页 */
+  .search-bar { display: flex; align-items: center; padding: 12px 16px; background: var(--card-bg); border-radius: 0 0 20px 20px; margin: 0 16px 16px; }
+  .search-bar .icon { font-size: 16px; margin-right: 8px; }
+  .search-bar input { flex: 1; border: none; outline: none; font-size: 14px; color: var(--text-primary); background: transparent; }
+  .filter-panel { padding: 16px; background: var(--card-bg); border-radius: 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
+  .filter-section { margin-bottom: 12px; }
+  .section-title-filter { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; display: block; }
+  .filter-options { display: flex; flex-wrap: wrap; gap: 8px; }
+  .filter-chip { padding: 6px 14px; border-radius: 16px; font-size: 12px; font-weight: 500; background: rgba(197, 184, 230, 0.15); color: var(--text-secondary); cursor: pointer; transition: all 0.2s; }
+  .filter-chip:hover { background: rgba(197, 184, 230, 0.25); }
+  .filter-chip.active { background: var(--gradient-primary); color: white; }
+  .topics-section { padding: 0 16px 16px; }
+  .topic-card { display: flex; align-items: center; background: var(--card-bg); border-radius: 20px; padding: 14px; margin-bottom: 12px; box-shadow: var(--shadow); }
+  .topic-img { width: 60px; height: 60px; border-radius: 16px; margin-right: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+  .topic-info { flex: 1; }
+  .topic-title { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+  .topic-posts { font-size: 12px; color: var(--text-light); }
+
+  /* 心情日历 */
+  .mood-calendar {
+    margin: 16px;
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .calendar-title { font-size: 16px; font-weight: 600; }
+  .calendar-nav { display: flex; gap: 8px; }
+  .calendar-nav button {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--lavender);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  .day-name {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-light);
+    padding: 4px;
+  }
+  .day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 12px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    position: relative;
+  }
+  .day.empty { visibility: hidden; }
+  .day.has-mood { color: white; font-weight: 600; }
+  .day.has-mood.mood-happy { background: var(--mint); }
+  .day.has-mood.mood-excited { background: var(--peach); }
+  .day.has-mood.mood-calm { background: var(--sky); }
+  .day.has-mood.mood-sad { background: var(--lavender); }
+  .day.has-mood.mood-tired { background: var(--butter); }
+  .day.today { border: 2px solid var(--lavender); }
+
+  /* 月度总结 */
+  .monthly-summary {
+    margin: 0 16px 16px;
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .summary-title { font-size: 14px; color: var(--text-secondary); margin-bottom: 8px; }
+  .summary-mood { font-size: 28px; font-weight: 700; color: var(--mint); margin-bottom: 4px; }
+  .summary-text { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; }
+  .summary-face { font-size: 60px; }
+
+  /* 统计卡片 */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 0 16px;
+    margin-bottom: 16px;
+  }
+  .stat-mini {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 12px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .stat-mini .label { font-size: 11px; color: var(--text-light); margin-bottom: 4px; }
+  .stat-mini .value { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+
+  /* 性格测试卡片 */
+  .quiz-section {
+    margin: 16px;
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+  .quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .quiz-title { font-size: 15px; font-weight: 600; }
+  .quiz-progress { font-size: 12px; color: var(--text-light); }
+  .quiz-question { font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+  .quiz-option {
+    padding: 12px 16px;
+    border-radius: 16px;
+    border: 2px solid var(--lavender);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 13px;
+    color: var(--text-primary);
+  }
+  .quiz-option:hover { background: rgba(197, 184, 230, 0.15); }
+  .quiz-option.selected { background: var(--gradient-primary); color: white; border-color: transparent; }
+</style>
+</head>
+<body>
+
+<!-- 搭子页 (首页) -->
+<div class="page active" id="page-buddy">
+  <div class="header">
+    <div class="location">
+      <span class="icon">📍</span>
+      <span class="city">北京 ▼</span>
+    </div>
+    <div class="actions">
+      <span>🔍</span>
+      <span>🔔</span>
+    </div>
+  </div>
+
+  <div class="welcome-back">
+    <img class="welcome-avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Me" alt="">
+    <div class="welcome-text">
+      <h3>欢迎回来！</h3>
+      <p>今天想和谁一起去旅行？✨</p>
+    </div>
+  </div>
+
+  <div class="mood-section">
+    <div class="mood-title">你现在的心情是？</div>
+    <div class="mood-grid">
+      <div class="mood-item active">
+        <span class="mood-icon">😊</span>
+        <span class="mood-label">开心</span>
+      </div>
+      <div class="mood-item">
+        <span class="mood-icon">😤</span>
+        <span class="mood-label">想释放</span>
+      </div>
+      <div class="mood-item">
+        <span class="mood-icon">😴</span>
+        <span class="mood-label">想放松</span>
+      </div>
+      <div class="mood-item">
+        <span class="mood-icon">🤩</span>
+        <span class="mood-label">想冒险</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card sleep">
+      <h4>🏕️ 本月行程</h4>
+      <div class="stat-value">3</div>
+      <div class="stat-chart">
+        <div class="bar" style="height: 30%"></div>
+        <div class="bar" style="height: 50%"></div>
+        <div class="bar" style="height: 40%"></div>
+        <div class="bar" style="height: 70%"></div>
+        <div class="bar" style="height: 60%"></div>
+        <div class="bar" style="height: 80%"></div>
+        <div class="bar" style="height: 90%"></div>
+      </div>
+    </div>
+    <div class="stat-card stress">
+      <h4>👥 匹配搭子</h4>
+      <div class="stat-value">8</div>
+      <div class="stat-chart">
+        <div class="bar" style="height: 40%"></div>
+        <div class="bar" style="height: 60%"></div>
+        <div class="bar" style="height: 50%"></div>
+        <div class="bar" style="height: 70%"></div>
+        <div class="bar" style="height: 80%"></div>
+        <div class="bar" style="height: 65%"></div>
+        <div class="bar" style="height: 85%"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">✨ 为你推荐</div>
+  <div class="filter-bar">
+    <div class="filter-item active">全部</div>
+    <div class="filter-item">同城</div>
+    <div class="filter-item">5公里</div>
+    <div class="filter-item">10公里</div>
+    <div class="filter-item">周边游</div>
+    <div class="filter-item">美食</div>
+    <div class="filter-item">拍照</div>
+    <div class="filter-item">徒步</div>
+  </div>
+
+  <div class="buddy-list">
+    <div class="buddy-card">
+      <div class="card-header">
+        <span class="distance">📍 3km</span>
+        <span class="match">匹配度 95%</span>
+      </div>
+      <div class="card-main">
+        <div class="avatar-wrapper">
+          <img class="avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Annie" alt="">
+          <span class="verified">✓</span>
+        </div>
+        <div class="info">
+          <div class="name-row">
+            <span class="nickname">小星星旅行家</span>
+            <span class="age">22岁</span>
+            <span class="gender female">♀</span>
+          </div>
+          <div class="signature">想找一个会拍照的搭子一起去环球影城 🎢</div>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-mint">美食</span>
+        <span class="tag tag-sky">拍照</span>
+        <span class="tag tag-lavender">慢节奏</span>
+      </div>
+      <div class="card-actions">
+        <div class="action-btn btn-pass">
+          <span class="btn-icon">✕</span>
+          <span>不感兴趣</span>
+        </div>
+        <div class="action-btn btn-like">
+          <span class="btn-icon">♥</span>
+          <span>喜欢</span>
+        </div>
+        <div class="action-btn btn-sayhi">
+          <span class="btn-icon">💬</span>
+          <span>打招呼</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="buddy-card">
+      <div class="card-header">
+        <span class="distance">📍 5km</span>
+        <span class="match">匹配度 88%</span>
+      </div>
+      <div class="card-main">
+        <div class="avatar-wrapper">
+          <img class="avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Jack" alt="">
+          <span class="verified">✓</span>
+        </div>
+        <div class="info">
+          <div class="name-row">
+            <span class="nickname">背包客小王</span>
+            <span class="age">25岁</span>
+            <span class="gender male">♂</span>
+          </div>
+          <div class="signature">周末想去爬香山，有没有一起的 🏔️</div>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-mint">徒步</span>
+        <span class="tag tag-peach">穷游</span>
+        <span class="tag tag-rose">特种兵式</span>
+      </div>
+      <div class="card-actions">
+        <div class="action-btn btn-pass">
+          <span class="btn-icon">✕</span>
+          <span>不感兴趣</span>
+        </div>
+        <div class="action-btn btn-like">
+          <span class="btn-icon">♥</span>
+          <span>喜欢</span>
+        </div>
+        <div class="action-btn btn-sayhi">
+          <span class="btn-icon">💬</span>
+          <span>打招呼</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 发现页 -->
+<div class="page" id="page-discover">
+  <div class="header">
+    <div class="location"><span class="icon">🔍</span><span class="city">发现</span></div>
+    <div class="actions"></div>
+  </div>
+  <div class="search-bar">
+    <span class="icon">🔍</span>
+    <input type="text" placeholder="搜索目的地、话题、搭子...">
+  </div>
+  <div class="filter-panel">
+    <div class="filter-section">
+      <span class="section-title-filter">距离</span>
+      <div class="filter-options">
+        <div class="filter-chip active">全部</div>
+        <div class="filter-chip">5km</div>
+        <div class="filter-chip">10km</div>
+        <div class="filter-chip">20km</div>
+        <div class="filter-chip">同城</div>
+        <div class="filter-chip">同省</div>
+      </div>
+    </div>
+    <div class="filter-section">
+      <span class="section-title-filter">兴趣偏好</span>
+      <div class="filter-options">
+        <div class="filter-chip active">全部</div>
+        <div class="filter-chip">美食</div>
+        <div class="filter-chip">拍照</div>
+        <div class="filter-chip">徒步</div>
+        <div class="filter-chip">探店</div>
+        <div class="filter-chip">看展</div>
+        <div class="filter-chip">自驾</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="section-title">🔥 热门话题</div>
+  <div class="topics-section">
+    <div class="topic-card">
+      <div class="topic-img" style="background: var(--gradient-fresh);">🌊</div>
+      <div class="topic-info">
+        <div class="topic-title">周末去看海</div>
+        <div class="topic-posts">128 篇帖子</div>
+      </div>
+    </div>
+    <div class="topic-card">
+      <div class="topic-img" style="background: var(--gradient-warm);">⛰️</div>
+      <div class="topic-info">
+        <div class="topic-title">一起去爬泰山</div>
+        <div class="topic-posts">96 篇帖子</div>
+      </div>
+    </div>
+    <div class="topic-card">
+      <div class="topic-img" style="background: var(--gradient-primary);">🍜</div>
+      <div class="topic-info">
+        <div class="topic-title">探店美食街</div>
+        <div class="topic-posts">256 篇帖子</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quiz-section">
+    <div class="quiz-header">
+      <div class="quiz-title">🎯 性格测试</div>
+      <div class="quiz-progress">Q1/8</div>
+    </div>
+    <div class="quiz-question">你更喜欢哪种旅行方式？</div>
+    <div class="quiz-options">
+      <div class="quiz-option selected">🎒 穷游，背包就走</div>
+      <div class="quiz-option">🏨 舒适型，住好酒店</div>
+      <div class="quiz-option">🚗 自驾，自由掌控</div>
+      <div class="quiz-option">🗺️ 深度游，慢节奏</div>
+    </div>
+  </div>
+</div>
+
+<!-- 行程页 -->
+<div class="page" id="page-trip">
+  <div class="header">
+    <div class="location"><span class="icon">🏕️</span><span class="city">行程</span></div>
+    <div class="actions"></div>
+  </div>
+  <div class="trip-tabs">
+    <div class="trip-tab active">我的行程</div>
+    <div class="trip-tab">发现行程</div>
+  </div>
+  <div class="trip-list">
+    <div class="trip-card">
+      <div class="trip-header">
+        <span class="trip-title">周末环球影城一日游</span>
+        <span class="status-tag">报名中</span>
+      </div>
+      <div class="trip-route">
+        <span>北京</span><span class="arrow">→</span><span>环球影城</span>
+      </div>
+      <div class="trip-meta">
+        <span class="meta-item">📅 2026-05-25 09:00</span>
+        <span class="meta-item">💰 300-500元</span>
+      </div>
+      <div class="trip-footer">
+        <div class="author-info">
+          <img class="author-avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Annie" alt="">
+          <span>小星星旅行家</span>
+        </div>
+        <div class="join-btn">我要报名</div>
+      </div>
+    </div>
+    <div class="trip-card">
+      <div class="trip-header">
+        <span class="trip-title">香山红叶徒步</span>
+        <span class="status-tag">报名中</span>
+      </div>
+      <div class="trip-route">
+        <span>北京</span><span class="arrow">→</span><span>香山公园</span>
+      </div>
+      <div class="trip-meta">
+        <span class="meta-item">📅 2026-05-26 07:00</span>
+        <span class="meta-item">💰 50-100元</span>
+      </div>
+      <div class="trip-footer">
+        <div class="author-info">
+          <img class="author-avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Jack" alt="">
+          <span>背包客小王</span>
+        </div>
+        <div class="join-btn">我要报名</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 消息页 -->
+<div class="page" id="page-chat">
+  <div class="header">
+    <div class="location"><span class="icon">💬</span><span class="city">消息</span></div>
+    <div class="actions"></div>
+  </div>
+  <div class="chat-list">
+    <div class="chat-item">
+      <div class="avatar-wrap">
+        <img class="avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Annie" alt="">
+        <span class="unread-badge">2</span>
+      </div>
+      <div class="chat-info">
+        <div class="chat-header">
+          <span class="chat-name">小星星旅行家</span>
+          <span class="chat-time">10:30</span>
+        </div>
+        <div class="last-msg">好的，那我们明天早上9点见！😊</div>
+      </div>
+    </div>
+    <div class="chat-item">
+      <div class="avatar-wrap">
+        <img class="avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Jack" alt="">
+      </div>
+      <div class="chat-info">
+        <div class="chat-header">
+          <span class="chat-name">环球影城拼团</span>
+          <span class="chat-time">昨天</span>
+        </div>
+        <div class="last-msg">小王: 我买了早场票，大家记得准时到</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 我的 -->
+<div class="page" id="page-profile">
+  <div class="profile-header">
+    <img class="avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Me" alt="">
+    <div class="nickname">点击登录</div>
+    <div class="city">未设置城市</div>
+  </div>
+  <div class="credit-card">
+    <div class="credit-header">
+      <span class="credit-label">信用分</span>
+      <span class="credit-score">180</span>
+    </div>
+    <div class="credit-bar">
+      <div class="credit-fill"></div>
+    </div>
+  </div>
+
+  <div class="mood-calendar">
+    <div class="calendar-header">
+      <div class="calendar-title">📅 旅行心情日历</div>
+      <div class="calendar-nav">
+        <button>‹</button>
+        <button>›</button>
+      </div>
+    </div>
+    <div class="calendar-grid">
+      <div class="day-name">一</div>
+      <div class="day-name">二</div>
+      <div class="day-name">三</div>
+      <div class="day-name">四</div>
+      <div class="day-name">五</div>
+      <div class="day-name">六</div>
+      <div class="day-name">日</div>
+      <div class="day empty"></div>
+      <div class="day empty"></div>
+      <div class="day empty"></div>
+      <div class="day empty"></div>
+      <div class="day empty"></div>
+      <div class="day empty"></div>
+      <div class="day">1</div>
+      <div class="day">2</div>
+      <div class="day">3</div>
+      <div class="day">4</div>
+      <div class="day">5</div>
+      <div class="day">6</div>
+      <div class="day">7</div>
+      <div class="day has-mood mood-happy">8</div>
+      <div class="day has-mood mood-excited">9</div>
+      <div class="day has-mood mood-calm">10</div>
+      <div class="day has-mood mood-sad">11</div>
+      <div class="day has-mood mood-tired">12</div>
+      <div class="day has-mood mood-happy">13</div>
+      <div class="day has-mood mood-excited">14</div>
+      <div class="day has-mood mood-calm">15</div>
+      <div class="day has-mood mood-happy">16</div>
+      <div class="day has-mood mood-tired">17</div>
+      <div class="day has-mood mood-sad">18</div>
+      <div class="day has-mood mood-happy">19</div>
+      <div class="day has-mood mood-excited">20</div>
+      <div class="day has-mood mood-calm">21</div>
+      <div class="day has-mood mood-happy">22</div>
+      <div class="day today has-mood mood-happy">23</div>
+      <div class="day">24</div>
+      <div class="day">25</div>
+      <div class="day">26</div>
+      <div class="day">27</div>
+      <div class="day">28</div>
+      <div class="day">29</div>
+      <div class="day">30</div>
+      <div class="day">31</div>
+    </div>
+  </div>
+
+  <div class="monthly-summary">
+    <div class="summary-title">🌟 本月旅行心情</div>
+    <div class="summary-mood">😊 快乐满满</div>
+    <div class="summary-text">你这个月参加了 4 次旅行，认识了 8 个新朋友！</div>
+    <div class="summary-face">🥳</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-mini">
+      <div class="label">👣 行程数</div>
+      <div class="value">4</div>
+    </div>
+    <div class="stat-mini">
+      <div class="label">👥 认识搭子</div>
+      <div class="value">8</div>
+    </div>
+    <div class="stat-mini">
+      <div class="label">⭐ 好评率</div>
+      <div class="value">95%</div>
+    </div>
+  </div>
+
+  <div class="menu-section">
+    <div class="menu-item">
+      <span class="menu-icon">🏕️</span>
+      <span class="menu-text">我的行程</span>
+      <span class="menu-arrow">></span>
+    </div>
+    <div class="menu-item">
+      <span class="menu-icon">👥</span>
+      <span class="menu-text">我的搭子</span>
+      <span class="menu-arrow">></span>
+    </div>
+    <div class="menu-item">
+      <span class="menu-icon">📸</span>
+      <span class="menu-text">我的相册</span>
+      <span class="menu-arrow">></span>
+    </div>
+  </div>
+  <div class="menu-section">
+    <div class="menu-item">
+      <span class="menu-icon">⚙️</span>
+      <span class="menu-text">设置</span>
+      <span class="menu-arrow">></span>
+    </div>
+    <div class="menu-item">
+      <span class="menu-icon">❓</span>
+      <span class="menu-text">帮助与反馈</span>
+      <span class="menu-arrow">></span>
+    </div>
+  </div>
+</div>
+
+<!-- TabBar -->
+<div class="tabbar">
+  <div class="tab-item active" onclick="switchPage('buddy', this)">
+    <span class="tab-icon">🧳</span>
+    <span>搭子</span>
+  </div>
+  <div class="tab-item" onclick="switchPage('discover', this)">
+    <span class="tab-icon">🔍</span>
+    <span>发现</span>
+  </div>
+  <div class="tab-item" onclick="switchPage('trip', this)">
+    <span class="tab-icon">🏕️</span>
+    <span>行程</span>
+  </div>
+  <div class="tab-item" onclick="switchPage('chat', this)">
+    <span class="tab-icon">💬</span>
+    <span>消息</span>
+  </div>
+  <div class="tab-item" onclick="switchPage('profile', this)">
+    <span class="tab-icon">👤</span>
+    <span>我的</span>
+  </div>
+</div>
+
+<script>
+function switchPage(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// 心情选择器
+document.querySelectorAll('.mood-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.mood-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+  });
+});
+
+// 性格测试
+document.querySelectorAll('.quiz-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    document.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>搭伴游 - 完整版</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --mint: #B8E6D0; --lavender: #C5B8E6; --peach: #FFB8A3;
+  --butter: #FFE0A3; --sky: #A3CFFF; --rose: #FFB8C6; --lemon: #FFF3A3;
+  --bg: #F8F5FF; --card-bg: #FFFFFF;
+  --text-primary: #3D3557; --text-secondary: #7B7399; --text-light: #B8B0CC;
+  --gradient-primary: linear-gradient(135deg, #C5B8E6, #A3CFFF);
+  --gradient-warm: linear-gradient(135deg, #FFB8A3, #FFE0A3);
+  --gradient-fresh: linear-gradient(135deg, #B8E6D0, #A3CFFF);
+  --shadow: 0 4px 20px rgba(61, 53, 87, 0.08);
+  --shadow-hover: 0 6px 24px rgba(61, 53, 87, 0.12);
+}
+
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg); color: var(--text-primary);
+  min-height: 100vh; overflow: hidden;
+}
+
+/* ===== 页面系统 ===== */
+.page-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+.sub-page {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--bg);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 20;
+  padding-bottom: 20px;
+}
+.sub-page.active { transform: translateX(0); }
+.sub-page.going-back { transform: translateX(100%); }
+
+/* 主Tab页面 */
+.tab-page { display: none; height: 100vh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 80px; }
+.tab-page.active { display: block; }
+
+/* ===== 通用组件 ===== */
+/* 顶部导航 */
+.header {
+  background: var(--gradient-primary); color: white;
+  padding: 20px 16px;
+  display: flex; justify-content: space-between; align-items: center;
+  position: sticky; top: 0; z-index: 10;
+}
+.header .left, .header .right { display: flex; align-items: center; gap: 6px; }
+.header .title { font-size: 16px; font-weight: 600; flex: 1; text-align: center; }
+.header .icon-btn {
+  font-size: 20px; cursor: pointer; padding: 4px;
+  transition: transform 0.2s; display: inline-block;
+}
+.header .icon-btn:active { transform: scale(1.2); }
+.header .back-btn { font-size: 22px; cursor: pointer; }
+
+/* Toast */
+.toast {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  background: rgba(61, 53, 87, 0.9); color: white;
+  padding: 12px 24px; border-radius: 12px; font-size: 14px;
+  z-index: 9999; opacity: 0; transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  pointer-events: none; text-align: center;
+}
+.toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+/* TabBar */
+.tabbar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  display: flex; background: var(--card-bg);
+  border-top: 1px solid rgba(197, 184, 230, 0.3);
+  padding: 8px 0; z-index: 15;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+}
+.tab-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  font-size: 10px; color: var(--text-light); cursor: pointer; transition: color 0.2s;
+}
+.tab-item:active { opacity: 0.6; }
+.tab-item.active { color: #9575CD; }
+.tab-item .tab-icon { font-size: 22px; transition: transform 0.3s; }
+.tab-item:active .tab-icon { transform: scale(1.3); }
+
+/* 通用卡片 */
+.card {
+  background: var(--card-bg); border-radius: 20px;
+  padding: 16px; margin: 0 16px 12px;
+  box-shadow: var(--shadow);
+}
+
+/* 按钮 */
+.btn {
+  padding: 12px 24px; border-radius: 20px; border: none;
+  font-size: 14px; font-weight: 500; cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+}
+.btn:active { transform: scale(0.96); }
+.btn-primary { background: var(--gradient-primary); color: white; }
+.btn-secondary { background: rgba(197, 184, 230, 0.2); color: #9575CD; }
+.btn-warm { background: var(--gradient-warm); color: white; }
+.btn-block { display: block; width: 100%; }
+.btn-sm { padding: 8px 16px; font-size: 12px; }
+
+/* 列表项 */
+.list-item {
+  display: flex; align-items: center; padding: 14px 16px;
+  background: var(--card-bg); cursor: pointer;
+  transition: background 0.2s;
+}
+.list-item:active { background: rgba(197, 184, 230, 0.1); }
+.list-item .item-icon { font-size: 20px; margin-right: 12px; }
+.list-item .item-text { flex: 1; font-size: 14px; }
+.list-item .item-arrow { color: var(--text-light); }
+.list-item .item-badge {
+  background: #FF8A80; color: white; font-size: 11px;
+  padding: 2px 8px; border-radius: 10px; margin-right: 8px;
+}
+
+/* 分割线 */
+.divider { height: 8px; background: var(--bg); }
+
+/* 输入框 */
+.input-field {
+  width: 100%; padding: 12px 16px; border-radius: 16px;
+  border: 2px solid rgba(197, 184, 230, 0.3);
+  font-size: 14px; outline: none; transition: border-color 0.2s;
+  font-family: inherit;
+}
+.input-field:focus { border-color: var(--lavender); }
+
+/* 标签/芯片 */
+.chip {
+  display: inline-block; padding: 6px 14px; border-radius: 16px;
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: all 0.2s;
+}
+.chip:active { transform: scale(0.95); }
+.chip-default { background: rgba(197, 184, 230, 0.15); color: var(--text-secondary); }
+.chip-active { background: var(--gradient-primary); color: white; }
+.chip-mint { background: rgba(184, 230, 208, 0.4); color: #66BB6A; }
+.chip-lavender { background: rgba(197, 184, 230, 0.4); color: #9575CD; }
+.chip-peach { background: rgba(255, 184, 163, 0.4); color: #FF8A65; }
+.chip-sky { background: rgba(163, 207, 255, 0.4); color: #64B5F6; }
+.chip-rose { background: rgba(255, 184, 198, 0.4); color: #F48FB1; }
+
+/* ===== 搭子页 ===== */
+.welcome-back {
+  padding: 20px 16px; display: flex; align-items: center; gap: 12px;
+  background: var(--card-bg); border-radius: 0 0 24px 24px;
+  box-shadow: var(--shadow); cursor: pointer; transition: transform 0.2s;
+}
+.welcome-back:active { transform: scale(0.98); }
+.welcome-avatar { width: 50px; height: 50px; border-radius: 50%; border: 3px solid var(--lavender); object-fit: cover; }
+.welcome-text h3 { font-size: 14px; color: var(--text-secondary); font-weight: 400; }
+.welcome-text p { font-size: 18px; font-weight: 600; }
+
+.mood-section { margin: 16px; background: var(--card-bg); border-radius: 20px; padding: 16px; box-shadow: var(--shadow); }
+.mood-title { font-size: 15px; color: var(--text-secondary); margin-bottom: 12px; }
+.mood-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.mood-item {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 12px 8px; border-radius: 16px; cursor: pointer;
+  transition: transform 0.2s, background 0.2s; border: 2px solid transparent;
+}
+.mood-item:active { transform: scale(0.9); }
+.mood-item.active { border-color: var(--lavender); background: rgba(197, 184, 230, 0.15); }
+.mood-icon { font-size: 28px; transition: transform 0.3s; }
+.mood-item:active .mood-icon { transform: scale(1.3) rotate(10deg); }
+.mood-label { font-size: 12px; color: var(--text-secondary); }
+
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px; margin-bottom: 16px; }
+.stat-card {
+  background: var(--card-bg); border-radius: 20px; padding: 16px;
+  box-shadow: var(--shadow); cursor: pointer; transition: transform 0.2s;
+}
+.stat-card:active { transform: scale(0.96); }
+.stat-card.sleep { border-left: 4px solid var(--peach); }
+.stat-card.match { border-left: 4px solid var(--lavender); }
+.stat-card h4 { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 400; }
+.stat-value { font-size: 24px; font-weight: 700; }
+.stat-chart { height: 40px; display: flex; align-items: flex-end; gap: 3px; margin-top: 8px; }
+.bar { flex: 1; border-radius: 4px 4px 0 0; background: var(--lavender); }
+.stat-card.sleep .bar { background: var(--peach); }
+
+.section-title { padding: 0 16px; font-size: 18px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+.filter-bar { display: flex; gap: 10px; padding: 12px 16px; overflow-x: auto; background: var(--card-bg); white-space: nowrap; }
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-item {
+  padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 500;
+  background: rgba(197, 184, 230, 0.15); color: var(--text-secondary);
+  cursor: pointer; flex-shrink: 0; transition: all 0.2s;
+}
+.filter-item:active { transform: scale(0.95); }
+.filter-item.active { background: var(--gradient-primary); color: white; }
+
+.buddy-list { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 16px; }
+.buddy-card {
+  background: var(--card-bg); border-radius: 24px; padding: 20px;
+  box-shadow: var(--shadow); position: relative; overflow: hidden;
+  transition: transform 0.2s;
+}
+.buddy-card:active { transform: scale(0.98); }
+.buddy-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: var(--gradient-warm);
+}
+.card-header { display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 12px; }
+.card-header .distance { color: var(--text-light); }
+.card-header .match { color: #FF8A80; font-weight: 600; background: rgba(255, 138, 128, 0.15); padding: 2px 10px; border-radius: 12px; }
+.card-main { display: flex; align-items: center; margin-bottom: 16px; cursor: pointer; }
+.avatar-wrapper { position: relative; margin-right: 12px; }
+.avatar { width: 64px; height: 64px; border-radius: 50%; border: 3px solid var(--lavender); object-fit: cover; }
+.avatar-sm { width: 44px; height: 44px; }
+.avatar-xs { width: 32px; height: 32px; }
+.verified {
+  position: absolute; right: -4px; bottom: -4px; width: 22px; height: 22px;
+  background: var(--mint); color: #4CAF50; font-size: 11px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-weight: bold;
+}
+.info { flex: 1; }
+.name-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.nickname { font-size: 16px; font-weight: 600; }
+.age { font-size: 12px; color: var(--text-secondary); }
+.gender { font-size: 12px; }
+.gender.male { color: #7B9FFF; }
+.gender.female { color: #FF8A80; }
+.signature { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
+.tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.tag { padding: 4px 12px; border-radius: 16px; font-size: 11px; font-weight: 500; }
+.card-actions { display: flex; justify-content: space-around; padding-top: 16px; border-top: 1px dashed var(--text-light); }
+.action-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 12px 20px; border-radius: 16px; font-size: 12px;
+  cursor: pointer; transition: background 0.2s, transform 0.2s;
+}
+.action-btn:active { transform: scale(0.9); }
+.btn-pass { color: var(--text-light); }
+.btn-like { color: #FF8A80; }
+.btn-like.liked { animation: heartBeat 0.5s; color: #FF4081; }
+.btn-sayhi { color: #9575CD; background: rgba(197, 184, 230, 0.2); }
+.btn-icon { font-size: 20px; transition: transform 0.3s; }
+.action-btn:active .btn-icon { transform: scale(1.4); }
+
+@keyframes heartBeat {
+  0% { transform: scale(1); } 25% { transform: scale(1.3); }
+  50% { transform: scale(1); } 75% { transform: scale(1.2); } 100% { transform: scale(1); }
+}
+
+/* ===== 行程页 ===== */
+.trip-tabs { display: flex; background: var(--card-bg); padding: 12px 0; border-radius: 0 0 20px 20px; }
+.trip-tab {
+  flex: 1; text-align: center; padding: 10px; font-size: 14px;
+  color: var(--text-secondary); border-bottom: 2px solid transparent;
+  cursor: pointer; transition: all 0.2s;
+}
+.trip-tab:active { opacity: 0.7; }
+.trip-tab.active { color: #9575CD; border-bottom-color: #9575CD; font-weight: 600; }
+.trip-list { padding: 16px; }
+.trip-card {
+  background: var(--card-bg); border-radius: 24px; padding: 20px;
+  margin-bottom: 12px; box-shadow: var(--shadow); position: relative;
+  overflow: hidden; cursor: pointer; transition: transform 0.2s;
+}
+.trip-card:active { transform: scale(0.98); }
+.trip-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: var(--gradient-fresh);
+}
+.trip-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.trip-title { font-size: 16px; font-weight: 600; }
+.status-tag {
+  padding: 4px 12px; border-radius: 16px; font-size: 11px;
+  background: rgba(184, 230, 208, 0.4); color: #66BB6A; font-weight: 500;
+}
+.trip-route { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; }
+.trip-route .arrow { color: #9575CD; margin: 0 10px; }
+.trip-meta { display: flex; gap: 16px; margin-bottom: 16px; }
+.meta-item { font-size: 12px; color: var(--text-light); }
+.trip-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px dashed var(--text-light); }
+.author-info { display: flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer; }
+.author-info:active { opacity: 0.7; }
+.author-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--lavender); }
+.join-btn {
+  padding: 10px 24px; background: var(--gradient-primary); color: white;
+  border-radius: 20px; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: transform 0.2s; border: none;
+}
+.join-btn:active { transform: scale(0.95); }
+.join-btn.joined { background: rgba(184, 230, 208, 0.5); color: #4CAF50; }
+
+/* 创建行程 */
+.create-form { padding: 16px; }
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 14px; font-weight: 600; margin-bottom: 8px; display: block; }
+.form-hint { font-size: 11px; color: var(--text-light); margin-top: 4px; }
+.form-row { display: flex; gap: 12px; }
+.form-row .form-group { flex: 1; }
+.form-select {
+  width: 100%; padding: 12px 16px; border-radius: 16px;
+  border: 2px solid rgba(197, 184, 230, 0.3); font-size: 14px;
+  outline: none; font-family: inherit; appearance: none;
+  background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237B7399' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 12px center;
+}
+textarea.input-field { min-height: 100px; resize: vertical; }
+
+/* ===== 消息页 ===== */
+.chat-list { padding: 16px; }
+.chat-item {
+  display: flex; align-items: center; padding: 16px;
+  background: var(--card-bg); border-radius: 20px; margin-bottom: 12px;
+  box-shadow: var(--shadow); transition: transform 0.2s; cursor: pointer;
+}
+.chat-item:active { transform: scale(0.98); }
+.chat-item .avatar-wrap { position: relative; margin-right: 12px; }
+.chat-item .avatar { width: 56px; height: 56px; border-radius: 50%; border: 3px solid var(--lavender); }
+.unread-badge {
+  position: absolute; top: -6px; right: -6px; background: #FF8A80;
+  color: white; font-size: 10px; padding: 3px 8px; border-radius: 12px; font-weight: 600;
+}
+.chat-info { flex: 1; }
+.chat-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.chat-name { font-size: 15px; font-weight: 600; }
+.chat-time { font-size: 11px; color: var(--text-light); }
+.last-msg { font-size: 13px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 260px; }
+
+/* 聊天对话 */
+.chat-conversation {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--card-bg); border-radius: 20px 20px 0 0;
+  padding: 16px; max-height: 70vh; display: flex; flex-direction: column;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+}
+.chat-messages { flex: 1; overflow-y: auto; padding-bottom: 12px; }
+.msg { display: flex; margin-bottom: 12px; }
+.msg.self { justify-content: flex-end; }
+.msg-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--lavender); margin-right: 8px; flex-shrink: 0; }
+.msg.self .msg-avatar { order: -1; margin-left: 8px; margin-right: 0; }
+.msg-bubble { max-width: 70%; padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.4; }
+.msg.other .msg-bubble { background: rgba(197, 184, 230, 0.15); border-top-left-radius: 4px; }
+.msg.self .msg-bubble { background: var(--gradient-primary); color: white; border-top-right-radius: 4px; }
+.msg-time { font-size: 10px; color: var(--text-light); margin-top: 4px; }
+.chat-input-bar {
+  display: flex; gap: 8px; padding-top: 12px;
+  border-top: 1px solid rgba(197, 184, 230, 0.2);
+}
+.chat-input-bar input {
+  flex: 1; padding: 10px 14px; border-radius: 20px;
+  border: 2px solid rgba(197, 184, 230, 0.3); font-size: 14px; outline: none;
+}
+.chat-input-bar input:focus { border-color: var(--lavender); }
+.chat-send {
+  padding: 10px 18px; border-radius: 20px; background: var(--gradient-primary);
+  color: white; border: none; font-size: 14px; cursor: pointer;
+}
+.chat-send:active { transform: scale(0.95); }
+
+/* ===== 我的 ===== */
+.profile-header-page {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 30px 16px 24px; background: var(--gradient-primary);
+  color: white; border-radius: 0 0 30px 30px; cursor: pointer;
+}
+.profile-header-page .avatar { width: 80px; height: 80px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.5); margin-bottom: 12px; }
+.profile-header-page .nickname { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+.profile-header-page .city { font-size: 13px; opacity: 0.9; }
+.credit-card {
+  margin: -20px 16px 16px; background: var(--card-bg);
+  border-radius: 20px; padding: 16px; box-shadow: var(--shadow);
+  cursor: pointer; transition: transform 0.2s;
+}
+.credit-card:active { transform: scale(0.98); }
+.credit-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.credit-label { font-size: 14px; color: var(--text-secondary); }
+.credit-score { font-size: 24px; font-weight: 700; color: #9575CD; }
+.credit-bar { height: 8px; background: rgba(197, 184, 230, 0.2); border-radius: 4px; overflow: hidden; }
+.credit-fill { height: 100%; background: var(--gradient-primary); border-radius: 4px; }
+.menu-section { background: var(--card-bg); border-radius: 20px; margin: 0 16px 16px; padding: 0 16px; box-shadow: var(--shadow); }
+.menu-item { display: flex; align-items: center; padding: 14px 0; border-bottom: 1px solid rgba(197, 184, 230, 0.2); cursor: pointer; }
+.menu-item:last-child { border-bottom: none; }
+.menu-item:active { opacity: 0.7; }
+.menu-icon { font-size: 20px; margin-right: 12px; }
+.menu-text { flex: 1; font-size: 14px; }
+.menu-arrow { color: var(--text-light); font-size: 12px; }
+
+/* 心情日历 */
+.mood-calendar { margin: 16px; background: var(--card-bg); border-radius: 20px; padding: 16px; box-shadow: var(--shadow); }
+.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.calendar-title { font-size: 16px; font-weight: 600; }
+.calendar-nav { display: flex; gap: 8px; }
+.calendar-nav button {
+  width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--lavender);
+  background: transparent; color: var(--text-secondary); cursor: pointer;
+  transition: all 0.2s;
+}
+.calendar-nav button:active { background: var(--lavender); color: white; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.day-name { text-align: center; font-size: 11px; color: var(--text-light); padding: 4px; }
+.day {
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; font-size: 12px; color: var(--text-secondary);
+  cursor: pointer; transition: transform 0.2s;
+}
+.day:active { transform: scale(1.2); }
+.day.empty { visibility: hidden; }
+.day.has-mood { color: white; font-weight: 600; }
+.day.has-mood.mood-happy { background: var(--mint); }
+.day.has-mood.mood-excited { background: var(--peach); }
+.day.has-mood.mood-calm { background: var(--sky); }
+.day.has-mood.mood-sad { background: var(--lavender); }
+.day.has-mood.mood-tired { background: var(--butter); }
+.day.today { border: 2px solid var(--lavender); }
+
+/* 月度总结 */
+.monthly-summary {
+  margin: 0 16px 16px; background: var(--card-bg); border-radius: 20px;
+  padding: 20px; box-shadow: var(--shadow); text-align: center;
+  cursor: pointer; transition: transform 0.2s;
+}
+.monthly-summary:active { transform: scale(0.98); }
+.summary-face { font-size: 60px; transition: transform 0.3s; }
+.monthly-summary:active .summary-face { transform: scale(1.2) rotate(10deg); }
+
+/* 统计行 */
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 16px; margin-bottom: 16px; }
+.stat-mini {
+  background: var(--card-bg); border-radius: 16px; padding: 12px;
+  text-align: center; box-shadow: var(--shadow); cursor: pointer;
+  transition: transform 0.2s;
+}
+.stat-mini:active { transform: scale(0.95); }
+.stat-mini .label { font-size: 11px; color: var(--text-light); margin-bottom: 4px; }
+.stat-mini .value { font-size: 16px; font-weight: 700; }
+
+/* 发现页 */
+.search-bar {
+  display: flex; align-items: center; padding: 12px 16px;
+  background: var(--card-bg); border-radius: 0 0 20px 20px;
+  margin: 0 16px 16px; cursor: pointer; transition: box-shadow 0.2s;
+}
+.search-bar:active { box-shadow: var(--shadow); }
+.search-bar .icon { font-size: 16px; margin-right: 8px; }
+.search-bar input { flex: 1; border: none; outline: none; font-size: 14px; background: transparent; }
+.filter-panel { padding: 16px; background: var(--card-bg); border-radius: 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
+.filter-section { margin-bottom: 12px; }
+.filter-section:last-child { margin-bottom: 0; }
+.section-title-filter { font-size: 14px; font-weight: 600; margin-bottom: 8px; display: block; }
+.filter-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.topics-section { padding: 0 16px 16px; }
+.topic-card {
+  display: flex; align-items: center; background: var(--card-bg);
+  border-radius: 20px; padding: 14px; margin-bottom: 12px;
+  box-shadow: var(--shadow); cursor: pointer; transition: transform 0.2s;
+}
+.topic-card:active { transform: scale(0.98); }
+.topic-img { width: 60px; height: 60px; border-radius: 16px; margin-right: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+.topic-info { flex: 1; }
+.topic-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.topic-posts { font-size: 12px; color: var(--text-light); }
+
+/* 性格测试 */
+.quiz-section { margin: 16px; background: var(--card-bg); border-radius: 20px; padding: 20px; box-shadow: var(--shadow); }
+.quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.quiz-title { font-size: 15px; font-weight: 600; }
+.quiz-progress { font-size: 12px; color: var(--text-light); }
+.quiz-question { font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; }
+.quiz-options { display: flex; flex-direction: column; gap: 10px; }
+.quiz-option {
+  padding: 12px 16px; border-radius: 16px; border: 2px solid var(--lavender);
+  cursor: pointer; transition: all 0.2s; font-size: 13px;
+}
+.quiz-option:active { transform: scale(0.97); }
+.quiz-option:hover { background: rgba(197, 184, 230, 0.15); }
+.quiz-option.selected { background: var(--gradient-primary); color: white; border-color: transparent; }
+
+/* 搜索结果 */
+.search-result-item {
+  display: flex; align-items: center; padding: 14px 16px;
+  background: var(--card-bg); margin-bottom: 8px;
+  cursor: pointer; transition: background 0.2s;
+}
+.search-result-item:active { background: rgba(197, 184, 230, 0.1); }
+.search-result-item .avatar { margin-right: 12px; }
+.search-result-type { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+
+/* 设置 */
+.setting-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 0; border-bottom: 1px solid rgba(197, 184, 230, 0.2);
+}
+.setting-item:last-child { border-bottom: none; }
+.setting-label { font-size: 14px; }
+.toggle-switch {
+  width: 48px; height: 28px; border-radius: 14px;
+  background: var(--text-light); position: relative;
+  cursor: pointer; transition: background 0.3s;
+}
+.toggle-switch.on { background: var(--gradient-primary); }
+.toggle-switch::after {
+  content: ''; position: absolute; top: 2px; left: 2px;
+  width: 24px; height: 24px; border-radius: 50%; background: white;
+  transition: transform 0.3s;
+}
+.toggle-switch.on::after { transform: translateX(20px); }
+
+/* 个人主页(他人) */
+.user-profile-hero {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 30px 16px; background: var(--gradient-primary);
+  color: white; border-radius: 0 0 30px 30px;
+}
+.user-profile-hero .avatar { width: 100px; height: 100px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.5); margin-bottom: 12px; }
+.user-profile-hero .nickname { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+.user-profile-hero .meta { font-size: 13px; opacity: 0.9; }
+.user-stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px; background: var(--card-bg); border-radius: 20px; padding: 16px; box-shadow: var(--shadow); }
+.user-stat { text-align: center; }
+.user-stat .val { font-size: 20px; font-weight: 700; }
+.user-stat .lbl { font-size: 11px; color: var(--text-light); }
+.user-action-row { display: flex; gap: 12px; padding: 0 16px; margin-bottom: 16px; }
+.user-bio { padding: 16px; margin: 0 16px 16px; background: var(--card-bg); border-radius: 20px; box-shadow: var(--shadow); }
+.user-bio h4 { font-size: 14px; margin-bottom: 8px; }
+.user-bio p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+/* 通知中心 */
+.notif-item {
+  display: flex; gap: 12px; padding: 14px 16px;
+  background: var(--card-bg); margin-bottom: 8px;
+  cursor: pointer; transition: background 0.2s;
+}
+.notif-item:active { background: rgba(197, 184, 230, 0.1); }
+.notif-item.unread { background: rgba(197, 184, 230, 0.08); }
+.notif-icon {
+  width: 44px; height: 44px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.notif-icon.like { background: rgba(255, 138, 128, 0.2); }
+.notif-icon.match { background: rgba(197, 184, 230, 0.3); }
+.notif-icon.trip { background: rgba(184, 230, 208, 0.4); }
+.notif-icon.system { background: rgba(255, 224, 163, 0.4); }
+.notif-content { flex: 1; }
+.notif-text { font-size: 14px; margin-bottom: 4px; }
+.notif-time { font-size: 11px; color: var(--text-light); }
+.notif-dot { width: 8px; height: 8px; border-radius: 50%; background: #FF8A80; flex-shrink: 0; margin-top: 6px; }
+
+/* 相册 */
+.album-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 0 16px; margin-bottom: 16px; }
+.album-item {
+  aspect-ratio: 1; border-radius: 12px; background: var(--lavender);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; cursor: pointer; transition: transform 0.2s;
+}
+.album-item:active { transform: scale(0.95); }
+
+/* 空状态 */
+.empty-state {
+  text-align: center; padding: 60px 20px;
+}
+.empty-state .icon { font-size: 64px; margin-bottom: 16px; }
+.empty-state .title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.empty-state .desc { font-size: 13px; color: var(--text-light); }
+</style>
+</head>
+<body>
+
+<div class="page-container" id="pageContainer">
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ==================== Tab 1: 搭子 ==================== -->
+  <div class="tab-page active" id="tab-buddy">
+    <div class="header">
+      <div class="left">
+        <span class="icon-btn" onclick="navTo('city')">📍</span>
+        <span style="font-size:16px;font-weight:600" id="cityDisplay">北京</span>
+      </div>
+      <div class="right">
+        <span class="icon-btn" onclick="navTo('search')">🔍</span>
+        <span class="icon-btn" onclick="navTo('notifications')">🔔</span>
+      </div>
+    </div>
+
+    <div class="welcome-back" onclick="navTo('user/me')">
+      <img class="welcome-avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Me&backgroundColor=b6e3f4" alt="">
+      <div class="welcome-text">
+        <h3>欢迎回来！</h3>
+        <p>今天想和谁一起去旅行？✨</p>
+      </div>
+    </div>
+
+    <div class="mood-section">
+      <div class="mood-title">你现在的心情是？</div>
+      <div class="mood-grid">
+        <div class="mood-item active" onclick="selectMood(this, '😊', '开心')"><span class="mood-icon">😊</span><span class="mood-label">开心</span></div>
+        <div class="mood-item" onclick="selectMood(this, '😤', '想释放')"><span class="mood-icon">😤</span><span class="mood-label">想释放</span></div>
+        <div class="mood-item" onclick="selectMood(this, '😴', '想放松')"><span class="mood-icon">😴</span><span class="mood-label">想放松</span></div>
+        <div class="mood-item" onclick="selectMood(this, '🤩', '想冒险')"><span class="mood-icon">🤩</span><span class="mood-label">想冒险</span></div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card sleep" onclick="navTo('my-trips')">
+        <h4>🏕️ 本月行程</h4>
+        <div class="stat-value">3</div>
+        <div class="stat-chart"><div class="bar" style="height:30%"></div><div class="bar" style="height:50%"></div><div class="bar" style="height:40%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:60%"></div><div class="bar" style="height:80%"></div><div class="bar" style="height:90%"></div></div>
+      </div>
+      <div class="stat-card match" onclick="navTo('my-buddies')">
+        <h4>👥 匹配搭子</h4>
+        <div class="stat-value">8</div>
+        <div class="stat-chart"><div class="bar" style="height:40%"></div><div class="bar" style="height:60%"></div><div class="bar" style="height:50%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:80%"></div><div class="bar" style="height:65%"></div><div class="bar" style="height:85%"></div></div>
+      </div>
+    </div>
+
+    <div class="section-title">✨ 为你推荐</div>
+    <div class="filter-bar" id="buddyFilterBar">
+      <div class="filter-item active" onclick="selectFilter(this, '全部')">全部</div>
+      <div class="filter-item" onclick="selectFilter(this, '同城')">同城</div>
+      <div class="filter-item" onclick="selectFilter(this, '5公里')">5公里</div>
+      <div class="filter-item" onclick="selectFilter(this, '10公里')">10公里</div>
+      <div class="filter-item" onclick="selectFilter(this, '周边游')">周边游</div>
+      <div class="filter-item" onclick="selectFilter(this, '美食')">美食</div>
+      <div class="filter-item" onclick="selectFilter(this, '拍照')">拍照</div>
+      <div class="filter-item" onclick="selectFilter(this, '徒步')">徒步</div>
+    </div>
+
+    <div class="buddy-list" id="buddyList">
+      <!-- 搭子卡片由 JS 渲染 -->
+    </div>
+  </div>
+
+  <!-- ==================== Tab 2: 发现 ==================== -->
+  <div class="tab-page" id="tab-discover">
+    <div class="header">
+      <div class="title">发现</div>
+      <div class="right"><span class="icon-btn" onclick="navTo('search')">🔍</span></div>
+    </div>
+    <div class="search-bar" onclick="navTo('search')">
+      <span class="icon">🔍</span><input type="text" placeholder="搜索目的地、话题、搭子..." readonly>
+    </div>
+    <div class="filter-panel">
+      <div class="filter-section">
+        <span class="section-title-filter">距离</span>
+        <div class="filter-options">
+          <div class="chip chip-active" onclick="selectChip(this)">全部</div>
+          <div class="chip chip-default" onclick="selectChip(this)">5km</div>
+          <div class="chip chip-default" onclick="selectChip(this)">10km</div>
+          <div class="chip chip-default" onclick="selectChip(this)">20km</div>
+          <div class="chip chip-default" onclick="selectChip(this)">同城</div>
+        </div>
+      </div>
+      <div class="filter-section" style="margin-top:12px">
+        <span class="section-title-filter">兴趣偏好</span>
+        <div class="filter-options">
+          <div class="chip chip-active" onclick="selectChip(this)">全部</div>
+          <div class="chip chip-default" onclick="selectChip(this)">美食</div>
+          <div class="chip chip-default" onclick="selectChip(this)">拍照</div>
+          <div class="chip chip-default" onclick="selectChip(this)">徒步</div>
+          <div class="chip chip-default" onclick="selectChip(this)">探店</div>
+          <div class="chip chip-default" onclick="selectChip(this)">看展</div>
+        </div>
+      </div>
+    </div>
+    <div class="section-title">🔥 热门话题</div>
+    <div class="topics-section" id="topicsList">
+      <!-- 话题由 JS 渲染 -->
+    </div>
+    <div class="quiz-section" style="cursor:pointer" onclick="navTo('quiz')">
+      <div class="quiz-header"><div class="quiz-title">🎯 性格测试</div><div class="quiz-progress">点击开始</div></div>
+      <div class="quiz-question">了解你的旅行风格，找到最匹配的搭子！</div>
+      <div class="quiz-options">
+        <div class="quiz-option selected">🎒 穷游，背包就走</div>
+        <div class="quiz-option">🏨 舒适型，住好酒店</div>
+        <div class="quiz-option">🚗 自驾，自由掌控</div>
+        <div class="quiz-option">🗺️ 深度游，慢节奏</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== Tab 3: 行程 ==================== -->
+  <div class="tab-page" id="tab-trip">
+    <div class="header">
+      <div class="title">行程</div>
+      <div class="right"><span class="icon-btn" onclick="navTo('trip-create')">＋</span></div>
+    </div>
+    <div class="trip-tabs">
+      <div class="trip-tab active" onclick="switchTripTab(this, 'discover')">发现行程</div>
+      <div class="trip-tab" onclick="switchTripTab(this, 'mine')">我的行程</div>
+    </div>
+    <div class="trip-list" id="tripList">
+      <!-- 行程由 JS 渲染 -->
+    </div>
+  </div>
+
+  <!-- ==================== Tab 4: 消息 ==================== -->
+  <div class="tab-page" id="tab-chat">
+    <div class="header">
+      <div class="title">消息</div>
+      <div class="right"></div>
+    </div>
+    <div class="chat-list" id="chatList">
+      <!-- 聊天列表由 JS 渲染 -->
+    </div>
+  </div>
+
+  <!-- ==================== Tab 5: 我的 ==================== -->
+  <div class="tab-page" id="tab-profile">
+    <div class="profile-header-page" onclick="navTo('user/me')">
+      <img class="avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Me&backgroundColor=b6e3f4" alt="">
+      <div class="nickname">旅行小达人</div>
+      <div class="city">📍 北京</div>
+    </div>
+    <div class="credit-card" onclick="showToast('信用分 180 - 表现良好')">
+      <div class="credit-header"><span class="credit-label">信用分</span><span class="credit-score">180</span></div>
+      <div class="credit-bar"><div class="credit-fill" style="width:60%"></div></div>
+    </div>
+
+    <div class="mood-calendar" id="moodCalendar">
+      <div class="calendar-header">
+        <div class="calendar-title">📅 5月 心情日历</div>
+        <div class="calendar-nav">
+          <button onclick="showToast('上个月')">‹</button>
+          <button onclick="showToast('下个月')">›</button>
+        </div>
+      </div>
+      <div class="calendar-grid" id="calendarGrid">
+        <!-- 日历由 JS 渲染 -->
+      </div>
+    </div>
+
+    <div class="monthly-summary" onclick="navTo('mood-summary')">
+      <div style="font-size:14px;color:var(--text-secondary);margin-bottom:8px">🌟 本月旅行心情</div>
+      <div style="font-size:20px;font-weight:700;color:#66BB6A;margin-bottom:4px">😊 快乐满满</div>
+      <div style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">参加了 4 次旅行，认识了 8 个新朋友</div>
+      <div class="summary-face">🥳</div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-mini" onclick="navTo('my-trips')"><div class="label">👣 行程数</div><div class="value">4</div></div>
+      <div class="stat-mini" onclick="navTo('my-buddies')"><div class="label">👥 认识搭子</div><div class="value">8</div></div>
+      <div class="stat-mini" onclick="showToast('好评率 95%')"><div class="label">⭐ 好评率</div><div class="value">95%</div></div>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-item" onclick="navTo('my-trips')"><span class="menu-icon">🏕️</span><span class="menu-text">我的行程</span><span class="menu-arrow">›</span></div>
+      <div class="menu-item" onclick="navTo('my-buddies')"><span class="menu-icon">👥</span><span class="menu-text">我的搭子</span><span class="menu-arrow">›</span></div>
+      <div class="menu-item" onclick="navTo('album')"><span class="menu-icon">📸</span><span class="menu-text">我的相册</span><span class="menu-arrow">›</span></div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-item" onclick="navTo('settings')"><span class="menu-icon">⚙️</span><span class="menu-text">设置</span><span class="menu-arrow">›</span></div>
+      <div class="menu-item" onclick="showToast('帮助与反馈')"><span class="menu-icon">❓</span><span class="menu-text">帮助与反馈</span><span class="menu-arrow">›</span></div>
+    </div>
+  </div>
+
+  <!-- ==================== TabBar ==================== -->
+  <div class="tabbar" id="tabbar">
+    <div class="tab-item active" onclick="switchTab('buddy', this)"><span class="tab-icon">🧳</span><span>搭子</span></div>
+    <div class="tab-item" onclick="switchTab('discover', this)"><span class="tab-icon">🔍</span><span>发现</span></div>
+    <div class="tab-item" onclick="switchTab('trip', this)"><span class="tab-icon">🏕️</span><span>行程</span></div>
+    <div class="tab-item" onclick="switchTab('chat', this)"><span class="tab-icon">💬</span><span>消息</span></div>
+    <div class="tab-item" onclick="switchTab('profile', this)"><span class="tab-icon">👤</span><span>我的</span></div>
+  </div>
+
+  <!-- ==================== 子页面容器 ==================== -->
+  <div id="subPages"></div>
+
+</div>
+
+<script>
+// ===== 数据 =====
+const DATA = {
+  buddies: [
+    { id: 'annie', name: '小星星旅行家', age: 22, gender: 'female', city: '北京', distance: '3km', match: 95, seed: 'Annie', bg: 'b6e3f4', sig: '想找一个会拍照的搭子一起去环球影城 🎢', tags: [{text:'美食',cls:'chip-mint'},{text:'拍照',cls:'chip-sky'},{text:'慢节奏',cls:'chip-lavender'}], trips: 3, buddies: 8, rating: '95%', bio: '22岁，北京人，摄影爱好者。喜欢拍照记录生活中的美好瞬间。周末经常去环球影城、颐和园等地拍照。性格温柔开朗，期待遇到志同道合的旅行搭子！' },
+    { id: 'jack', name: '背包客小王', age: 25, gender: 'male', city: '北京', distance: '5km', match: 88, seed: 'Jack', bg: 'c0aede', sig: '周末想去爬香山，有没有一起的 🏔️', tags: [{text:'徒步',cls:'chip-mint'},{text:'穷游',cls:'chip-peach'},{text:'特种兵式',cls:'chip-rose'}], trips: 5, buddies: 12, rating: '92%', bio: '25岁，户外爱好者。喜欢徒步、登山、露营。去过15个省份，希望用脚步丈量中国。性格直爽，做事靠谱，适合一起探索未知的旅程。' },
+    { id: 'luna', name: '月亮不睡', age: 20, gender: 'female', city: '北京', distance: '8km', match: 82, seed: 'Luna', bg: 'ffd5dc', sig: '想要一个会做攻略的搭子～', tags: [{text:'美食',cls:'chip-mint'},{text:'探店',cls:'chip-peach'},{text:'看展',cls:'chip-lavender'}], trips: 2, buddies: 5, rating: '98%', bio: '20岁，大学生。喜欢探索北京各种美食小店和艺术展览。对美食有独特的品味，喜欢打卡网红店铺。期待有人一起探索城市角落。' },
+    { id: 'max', name: 'Max在路上', age: 28, gender: 'male', city: '北京', distance: '12km', match: 78, seed: 'Max', bg: 'd1f4d1', sig: '自驾爱好者，周末经常周边游', tags: [{text:'自驾',cls:'chip-sky'},{text:'摄影',cls:'chip-lavender'},{text:'露营',cls:'chip-mint'}], trips: 8, buddies: 15, rating: '96%', bio: '28岁，程序员，自驾爱好者。有A本驾照，开过SUV去过西藏。喜欢摄影和露营，装备齐全。期待找搭子一起自驾探索周边美景。' },
+    { id: 'cici', name: 'Cici爱旅行', age: 24, gender: 'female', city: '北京', distance: '2km', match: 91, seed: 'Cici', bg: 'ffdfbf', sig: '环球影城年卡持有者，求搭子', tags: [{text:'乐园',cls:'chip-peach'},{text:'拍照',cls:'chip-sky'},{text:'美食',cls:'chip-mint'}], trips: 6, buddies: 10, rating: '97%', bio: '24岁，环球影城年卡持有者。去过50+次，对每个项目都了如指掌。喜欢拍照打卡，会做详细攻略。如果你也爱环球影城，快来找我！' },
+  ],
+  topics: [
+    { id: 'sea', title: '周末去看海', emoji: '🌊', bg: 'var(--gradient-fresh)', posts: 128 },
+    { id: 'mount', title: '一起去爬泰山', emoji: '⛰️', bg: 'var(--gradient-warm)', posts: 96 },
+    { id: 'food', title: '探店美食街', emoji: '🍜', bg: 'var(--gradient-primary)', posts: 256 },
+    { id: 'photo', title: '拍照搭子集合', emoji: '📸', bg: 'var(--gradient-fresh)', posts: 180 },
+    { id: 'camp', title: '露营好去处', emoji: '⛺', bg: 'var(--gradient-warm)', posts: 75 },
+  ],
+  trips: [
+    { id: 't1', title: '周末环球影城一日游', from: '北京', to: '环球影城', date: '05-25 09:00', budget: '300-500元', author: 'annie', status: '报名中', people: '3/5', difficulty: '轻松' },
+    { id: 't2', title: '香山红叶徒步', from: '北京', to: '香山公园', date: '05-26 07:00', budget: '50-100元', author: 'jack', status: '报名中', people: '5/8', difficulty: '中等' },
+    { id: 't3', title: '798看展+咖啡', from: '朝阳区', to: '798艺术区', date: '05-27 14:00', budget: '100-200元', author: 'luna', status: '报名中', people: '2/4', difficulty: '轻松' },
+    { id: 't4', title: '怀柔水库露营', from: '北京', to: '怀柔水库', date: '05-30 08:00', budget: '200-400元', author: 'max', status: '报名中', people: '4/6', difficulty: '轻松' },
+    { id: 't5', title: '环球影城深度游(2天)', from: '北京', to: '环球影城', date: '06-01 08:00', budget: '600-800元', author: 'cici', status: '报名中', people: '1/4', difficulty: '轻松' },
+  ],
+  chats: [
+    { id: 'annie', name: '小星星旅行家', lastMsg: '好的，那我们明天早上9点见！😊', time: '10:30', unread: 2, seed: 'Annie', bg: 'b6e3f4',
+      messages: [
+        { self: false, text: '你好呀！看到你也在找环球影城的搭子', time: '10:20' },
+        { self: true, text: '对呀！我正好有年卡，要不要一起？', time: '10:25' },
+        { self: false, text: '太棒了！我好久没去了', time: '10:27' },
+        { self: true, text: '明天早上9点在地铁站集合可以吗？', time: '10:28' },
+        { self: false, text: '好的，那我们明天早上9点见！😊', time: '10:30' },
+      ]},
+    { id: 'jack', name: '背包客小王', lastMsg: '我买了早场票，大家记得准时到', time: '昨天', unread: 0, seed: 'Jack', bg: 'c0aede',
+      messages: [
+        { self: false, text: '周末香山的行程确定了吗？', time: '昨天 15:00' },
+        { self: true, text: '确定啦！7点东门集合', time: '昨天 15:05' },
+        { self: false, text: '好的，我买了早场票，大家记得准时到', time: '昨天 15:10' },
+      ]},
+    { id: 'luna', name: '月亮不睡', lastMsg: '你推荐的这家店真的好好吃！', time: '昨天', unread: 0, seed: 'Luna', bg: 'ffd5dc',
+      messages: [
+        { self: true, text: '推荐你去南锣鼓巷那家甜品店', time: '昨天 12:00' },
+        { self: false, text: '好！这周末就去', time: '昨天 12:05' },
+        { self: false, text: '你推荐的这家店真的好好吃！', time: '昨天 18:00' },
+      ]},
+    { id: 'cici', name: 'Cici爱旅行', lastMsg: '环球影城新开了哈利波特园区！', time: '周一', unread: 0, seed: 'Cici', bg: 'ffdfbf',
+      messages: [
+        { self: false, text: '环球影城新开了哈利波特园区！', time: '周一 10:00' },
+      ]},
+  ],
+  notifications: [
+    { type: 'like', icon: '❤️', text: 'Cici爱旅行 喜欢了你', time: '刚刚', unread: true },
+    { type: 'match', icon: '🤝', text: '你和背包客小王成功匹配啦！', time: '10分钟前', unread: true },
+    { type: 'trip', icon: '🏕️', text: '你的行程「香山徒步」有新报名', time: '昨天', unread: false },
+    { type: 'system', icon: '📢', text: '系统提示：信用分更新为 180', time: '3天前', unread: false },
+    { type: 'like', icon: '❤️', text: 'Max在路上 收藏了你的行程', time: '3天前', unread: false },
+    { type: 'match', icon: '🤝', text: '你和Cici爱旅行成功匹配啦！', time: '上周', unread: false },
+  ],
+  searchResults: {
+    default: [
+      { type: 'user', name: '小星星旅行家', desc: '美食 · 拍照', seed: 'Annie', bg: 'b6e3f4', action: 'user/annie' },
+      { type: 'user', name: '背包客小王', desc: '徒步 · 穷游', seed: 'Jack', bg: 'c0aede', action: 'user/jack' },
+      { type: 'topic', name: '环球影城', desc: '128 篇帖子', emoji: '🎢', action: 'topic/sea' },
+      { type: 'trip', name: '周末环球影城一日游', desc: '5月25日 · 北京', emoji: '🏕️', action: 'trip/t1' },
+      { type: 'topic', name: '周末徒步', desc: '96 篇帖子', emoji: '🥾', action: 'topic/mount' },
+      { type: 'trip', name: '香山红叶徒步', desc: '5月26日 · 北京', emoji: '🏕️', action: 'trip/t2' },
+    ]
+  },
+  moodDays: {
+    '8': { mood: 'happy', emoji: '😊', records: [{emoji:'😊',text:'今天参加了环球影城之旅，超开心！'},{emoji:'📸',text:'拍了很多好看的照片'}]},
+    '9': { mood: 'excited', emoji: '😤', records: [{emoji:'🏔️',text:'爬了香山，虽然累但很爽！'}]},
+    '10': { mood: 'calm', emoji: '😴', records: [{emoji:'☕',text:'在家喝咖啡看书，很放松'}]},
+    '11': { mood: 'sad', emoji: '😢', records: [{emoji:'😢',text:'下雨天取消了户外行程'}]},
+    '12': { mood: 'tired', emoji: '😩', records: [{emoji:'💼',text:'加班了一天，好累'}]},
+    '13': { mood: 'happy', emoji: '😊', records: [{emoji:'🍜',text:'和搭子一起探店'}]},
+    '14': { mood: 'excited', emoji: '😤', records: [{emoji:'🎉',text:'匹配到新的搭子！'}]},
+    '15': { mood: 'calm', emoji: '😴', records: [{emoji:'🌳',text:'去公园散步'}]},
+    '16': { mood: 'happy', emoji: '😊', records: [{emoji:'🎢',text:'又去了环球影城！'}]},
+    '17': { mood: 'tired', emoji: '😩', records: [{emoji:'🚗',text:'开车去了怀柔，好远'}]},
+    '18': { mood: 'sad', emoji: '😢', records: [{emoji:'😔',text:'搭子临时取消了'}]},
+    '19': { mood: 'happy', emoji: '😊', records: [{emoji:'🏕️',text:'终于去露营了！'}]},
+    '20': { mood: 'excited', emoji: '🤩', records: [{emoji:'⛺',text:'露营看星星好美'}]},
+    '21': { mood: 'calm', emoji: '😴', records: [{emoji:'📚',text:'在家休息一天'}]},
+    '22': { mood: 'happy', emoji: '😊', records: [{emoji:'📸',text:'去798看展'}]},
+    '23': { mood: 'happy', emoji: '😊', records: [{emoji:'🥳',text:'今天好开心！'}]},
+  }
+};
+
+// ===== 路由系统 =====
+const Router = {
+  history: [],
+  current: null,
+  patterns: [],
+  
+  init() {
+    // 预编译参数化路由模式
+    for (const key of Object.keys(pageBuilders)) {
+      if (key.includes('/:')) {
+        const parts = key.split('/:');
+        const prefix = parts[0] + '/';
+        const paramName = parts[1];
+        this.patterns.push({ prefix, paramName, builder: pageBuilders[key] });
+        delete pageBuilders[key]; // 从直接查找中移除
+      }
+    }
+  },
+  
+  resolvePage(page) {
+    // 先精确匹配
+    if (pageBuilders[page]) return pageBuilders[page]();
+    // 再匹配参数化路由
+    for (const { prefix, paramName, builder } of this.patterns) {
+      if (page.startsWith(prefix)) {
+        const param = page.slice(prefix.length);
+        return builder(param);
+      }
+    }
+    // 未匹配 — 返回空状态
+    return '<div class="empty-state"><div class="icon">🚧</div><div class="title">页面建设中</div><div class="desc">该页面尚未实现</div></div>';
+  },
+  
+  navigate(page) {
+    this.history.push(this.current);
+    this.current = page;
+    const container = document.getElementById('subPages');
+    const existing = document.getElementById('sub-' + page);
+    if (existing) { existing.classList.add('active'); return; }
+    const html = this.resolvePage(page);
+    const div = document.createElement('div');
+    div.className = 'sub-page active';
+    div.id = 'sub-' + page;
+    div.innerHTML = html;
+    container.appendChild(div);
+  },
+  
+  back() {
+    const container = document.getElementById('subPages');
+    const pages = container.querySelectorAll('.sub-page');
+    if (pages.length === 0) return;
+    const last = pages[pages.length - 1];
+    last.classList.remove('active');
+    last.classList.add('going-back');
+    setTimeout(() => last.remove(), 300);
+    this.current = this.history.pop() || null;
+  }
+};
+
+function navTo(page) {
+  Router.navigate(page);
+}
+
+function goBack() {
+  Router.back();
+}
+
+// ===== Tab 切换 =====
+function switchTab(name, el) {
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ===== 页面构建器 =====
+const pageBuilders = {
+
+// --- 个人主页 (他人) ---
+'user/:id'(param) {
+  const b = DATA.buddies.find(b => b.id === param) || DATA.buddies[0];
+  return `
+    <div class="user-profile-hero">
+      <img class="avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=${b.seed}&backgroundColor=${b.bg}" alt="">
+      <div class="nickname">${b.name}</div>
+      <div class="meta">${b.age}岁 · ${b.city} · ${b.gender === 'female' ? '♀' : '♂'}</div>
+    </div>
+    <div class="user-stats-row">
+      <div class="user-stat"><div class="val">${b.trips}</div><div class="lbl">行程</div></div>
+      <div class="user-stat"><div class="val">${b.buddies}</div><div class="lbl">搭子</div></div>
+      <div class="user-stat"><div class="val">${b.rating}</div><div class="lbl">好评</div></div>
+    </div>
+    <div class="user-action-row">
+      <button class="btn btn-primary" style="flex:1" onclick="navTo('chat/${b.id}')">💬 发消息</button>
+      <button class="btn btn-secondary" style="flex:1" onclick="showToast('已收藏')">⭐ 收藏</button>
+    </div>
+    <div class="user-bio"><h4>关于我</h4><p>${b.bio}</p></div>
+    <div class="user-bio"><h4>兴趣标签</h4><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">${b.tags.map(t => `<span class="chip ${t.cls}">${t.text}</span>`).join('')}</div></div>
+    <div class="divider"></div>
+    <div style="padding:16px"><button class="btn btn-warm btn-block" onclick="showToast('❤️ 已发送喜欢')">❤️ 喜欢TA</button></div>
+  `;
+},
+
+// --- 编辑资料 ---
+'user/me'() {
+  return `
+    <div class="header"><span class="back-btn" onclick="goBack()">←</span><div class="title">编辑资料</div><div style="width:22px"></div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;padding:20px">
+      <img style="width:100px;height:100px;border-radius:50%;border:4px solid var(--lavender)" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Me&backgroundColor=b6e3f4" alt="">
+      <button class="btn btn-sm btn-secondary" style="margin-top:12px" onclick="showToast('更换头像')">更换头像</button>
+    </div>
+    <div class="create-form">
+      <div class="form-group"><label class="form-label">昵称</label><input class="input-field" value="旅行小达人"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">年龄</label><input class="input-field" type="number" value="23"></div>
+        <div class="form-group"><label class="form-label">性别</label><select class="form-select"><option>女</option><option>男</option></select></div>
+      </div>
+      <div class="form-group"><label class="form-label">城市</label><input class="input-field" value="北京"></div>
+      <div class="form-group"><label class="form-label">个人简介</label><textarea class="input-field" placeholder="介绍一下自己吧...">喜欢旅行，热爱生活，期待遇到志同道合的朋友！</textarea></div>
+      <div class="form-group"><label class="form-label">兴趣标签</label><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+        <span class="chip chip-active" onclick="this.classList.toggle('chip-active');this.classList.toggle('chip-default')">美食</span><span class="chip chip-active" onclick="this.classList.toggle('chip-active');this.classList.toggle('chip-default')">拍照</span><span class="chip chip-default" onclick="this.classList.toggle('chip-active');this.classList.toggle('chip-default')">徒步</span><span class="chip chip-default" onclick="this.classList.toggle('chip-active');this.classList.toggle('chip-default')">自驾</span><span class="chip chip-default" onclick="this.classList.toggle('chip-active');this.classList.toggle('chip-default')">探店</span><span class="chip chip-default" onclick="this.classList.toggle('chip-active');this.classList.toggle('chip-default')">看展</span>
+      </div></div>
+      <div style="padding:16px 0"><button class="btn btn-primary btn-block" onclick="showToast('✅ 资料已保存');goBack()">保存</button></div>
+    </div>
+  `;
+},
+
+// --- 聊天对话 ---
+'chat/:id'(param) {
+  const c = DATA.chats.find(c => c.id === param) || DATA.chats[0];
+  const msgsHtml = c.messages.map(m => `
+    <div class="msg ${m.self ? 'self' : 'other'}">
+      <img class="msg-avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=${c.seed}&backgroundColor=${c.bg}" alt="">
+      <div><div class="msg-bubble">${m.text}</div><div class="msg-time" style="${m.self ? 'text-align:right' : ''}">${m.time}</div></div>
+    </div>
+  `).join('');
+  return `
+    <div class="header">
+      <span class="back-btn" onclick="goBack()">←</span>
+      <img style="width:32px;height:32px;border-radius:50%;border:2px solid rgba(255,255,255,0.5);margin:0 8px" src="https://api.dicebear.com/7.x/adventurer/svg?seed=${c.seed}&backgroundColor=${c.bg}" alt="">
+      <div class="title">${c.name}</div><div style="width:22px"></div>
+    </div>
+    <div style="padding:16px;overflow-y:auto;max-height:calc(100vh - 220px)" id="chatMsgContainer">${msgsHtml}</div>
+    <div style="padding:0 16px">
+      <div class="chat-input-bar">
+        <input type="text" placeholder="输入消息..." id="chatInput" onkeypress="if(event.key==='Enter')sendChatMsg()">
+        <button class="chat-send" onclick="sendChatMsg()">发送</button>
+      </div>
+    </div>
+    <div style="padding:8px 16px;display:flex;gap:8px;flex-wrap:wrap">
+      <span class="chip chip-default" onclick="document.getElementById('chatInput').value='好的！'">好的！</span>
+      <span class="chip chip-default" onclick="document.getElementById('chatInput').value='几点见面？'">几点见面？</span>
+      <span class="chip chip-default" onclick="document.getElementById('chatInput').value='期待！'">期待！</span>
+    </div>
+  `;
+},
+
+// --- 行程详情 ---
+'trip/:id'(param) {
+  const t = DATA.trips.find(t => t.id === param) || DATA.trips[0];
+  const author = DATA.buddies.find(b => b.id === t.author) || DATA.buddies[0];
+  return `
+    <div class="header">
+      <span class="back-btn" onclick="goBack()">←</span>
+      <div class="title">${t.title}</div><div style="width:22px"></div>
+    </div>
+    <div style="text-align:center;padding:20px;font-size:22px;font-weight:600">
+      <span>${t.from}</span> <span style="color:#9575CD;margin:0 12px">→</span> <span>${t.to}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px;margin-bottom:16px">
+      <div style="padding:12px;background:rgba(197,184,230,0.15);border-radius:12px;text-align:center"><div style="font-size:11px;color:var(--text-light)">📅 时间</div><div style="font-size:14px;font-weight:600;margin-top:4px">${t.date}</div></div>
+      <div style="padding:12px;background:rgba(197,184,230,0.15);border-radius:12px;text-align:center"><div style="font-size:11px;color:var(--text-light)">💰 预算</div><div style="font-size:14px;font-weight:600;margin-top:4px">${t.budget}</div></div>
+      <div style="padding:12px;background:rgba(197,184,230,0.15);border-radius:12px;text-align:center"><div style="font-size:11px;color:var(--text-light)">👥 人数</div><div style="font-size:14px;font-weight:600;margin-top:4px">${t.people}</div></div>
+      <div style="padding:12px;background:rgba(197,184,230,0.15);border-radius:12px;text-align:center"><div style="font-size:11px;color:var(--text-light)">📍 难度</div><div style="font-size:14px;font-weight:600;margin-top:4px">${t.difficulty}</div></div>
+    </div>
+    <div class="card" style="display:flex;align-items:center;gap:12px;cursor:pointer" onclick="goBack();setTimeout(()=>navTo('user/${author.id}'),300)">
+      <img style="width:44px;height:44px;border-radius:50%;border:2px solid var(--lavender)" src="https://api.dicebear.com/7.x/adventurer/svg?seed=${author.seed}&backgroundColor=${author.bg}" alt="">
+      <div style="flex:1"><div style="font-size:15px;font-weight:600">${author.name}</div><div style="font-size:12px;color:var(--text-secondary)">发起人</div></div>
+      <span class="menu-arrow">›</span>
+    </div>
+    <div style="padding:16px">
+      <button class="btn btn-primary btn-block" id="joinBtn" onclick="toggleJoin(this)">我要报名</button>
+    </div>
+  `;
+},
+
+// --- 创建行程 ---
+'trip-create'() {
+  return `
+    <div class="header"><span class="back-btn" onclick="goBack()">←</span><div class="title">创建行程</div><div style="width:22px"></div></div>
+    <div class="create-form">
+      <div class="form-group"><label class="form-label">行程标题</label><input class="input-field" placeholder="给你的行程起个名字" id="tripTitle"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">出发地</label><input class="input-field" placeholder="北京" id="tripFrom"></div>
+        <div class="form-group"><label class="form-label">目的地</label><input class="input-field" placeholder="环球影城" id="tripTo"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">日期</label><input class="input-field" type="date" id="tripDate"></div>
+        <div class="form-group"><label class="form-label">时间</label><input class="input-field" type="time" value="09:00" id="tripTime"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">预算</label><input class="input-field" placeholder="300-500元" id="tripBudget"></div>
+        <div class="form-group"><label class="form-label">人数上限</label><input class="input-field" type="number" value="5" id="tripMax"></div>
+      </div>
+      <div class="form-group"><label class="form-label">难度</label><select class="form-select"><option>轻松</option><option>中等</option><option>较难</option></select></div>
+      <div class="form-group"><label class="form-label">行程描述</label><textarea class="input-field" placeholder="描述一下行程安排..." id="tripDesc"></textarea></div>
+      <div class="form-group"><label class="form-label">兴趣标签</label><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+        <span class="chip chip-active" onclick="this.classList.toggle('chip-active');this.classList.toggle('chip-default')">美食</span><span class="chip chip-default" onclick="this.classList.toggle('chip-active');this.classList.toggle('chip-default')">拍照</span><span class="chip chip-default" onclick="this.classList.toggle('chip-active');this.classList.toggle('chip-default')">徒步</span><span class="chip chip-default" onclick="this.classList.toggle('chip-active');this.classList.toggle('chip-default')">自驾</span><span class="chip chip-default" onclick="this.classList.toggle('chip-active');this.classList.toggle('chip-default')">探店</span>
+      </div></div>
+      <div style="padding:16px 0"><button class="btn btn-primary btn-block" onclick="showToast('🎉 行程创建成功！');goBack()">发布行程</button></div>
+    </div>
+  `;
+},
+
+// --- 搜索结果 ---
+'search'() {
+  const results = DATA.searchResults.default;
+  return `
+    <div class="header">
+      <span class="back-btn" onclick="goBack()">←</span>
+      <input style="flex:1;padding:8px 16px;border-radius:20px;border:none;font-size:14px;margin:0 8px;outline:none;background:rgba(255,255,255,0.2);color:white" placeholder="搜索..." id="searchInput">
+      <div style="width:22px"></div>
+    </div>
+    <div style="padding:12px 16px;display:flex;flex-wrap:wrap;gap:8px">
+      <span class="chip chip-active" onclick="showToast('搜索: 环球影城')">环球影城</span>
+      <span class="chip chip-default" onclick="showToast('搜索: 周末徒步')">周末徒步</span>
+      <span class="chip chip-default" onclick="showToast('搜索: 美食探店')">美食探店</span>
+      <span class="chip chip-default" onclick="showToast('搜索: 看日出')">看日出</span>
+      <span class="chip chip-default" onclick="showToast('搜索: 海边度假')">海边度假</span>
+    </div>
+    <div class="section-title">🔍 搜索结果</div>
+    <div id="searchResults">
+      ${results.map(r => `
+        <div class="search-result-item" onclick="goBack();setTimeout(()=>navTo('${r.action}'),300)">
+          ${r.type === 'user' ? `<img class="avatar avatar-sm" src="https://api.dicebear.com/7.x/adventurer/svg?seed=${r.seed}&backgroundColor=${r.bg}" alt="">` : `<div style="font-size:32px;margin-right:12px">${r.emoji || '🔍'}</div>`}
+          <div><div style="font-size:14px;font-weight:600">${r.name}</div><div class="search-result-type">${r.desc}</div></div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+},
+
+// --- 通知中心 ---
+'notifications'() {
+  return `
+    <div class="header"><span class="back-btn" onclick="goBack()">←</span><div class="title">通知</div><div style="width:22px"></div></div>
+    <div style="padding:0 16px;margin-bottom:8px;display:flex;justify-content:space-between">
+      <span style="font-size:13px;color:var(--text-secondary)">全部通知</span>
+      <span style="font-size:13px;color:#9575CD;cursor:pointer" onclick="showToast('全部标为已读')">全部已读</span>
+    </div>
+    ${DATA.notifications.map(n => `
+      <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="showToast('查看通知详情')">
+        <div class="notif-icon ${n.type}">${n.icon}</div>
+        <div class="notif-content">
+          <div class="notif-text">${n.text}</div>
+          <div class="notif-time">${n.time}</div>
+        </div>
+        ${n.unread ? '<div class="notif-dot"></div>' : ''}
+      </div>
+    `).join('')}
+  `;
+},
+
+// --- 话题详情 ---
+'topic/:id'(param) {
+  const topic = DATA.topics.find(t => t.id === param) || DATA.topics[0];
+  const posts = [
+    { text: '终于去了海边！天气超好～', author: '小星星旅行家', time: '2小时前', seed: 'Annie', bg: 'b6e3f4', likes: 24 },
+    { text: '推荐几个看海的宝藏地点', author: '背包客小王', time: '5小时前', seed: 'Jack', bg: 'c0aede', likes: 18 },
+    { text: '周末一起去看海吧！', author: '月亮不睡', time: '昨天', seed: 'Luna', bg: 'ffd5dc', likes: 32 },
+    { text: '海边拍照小技巧分享', author: 'Cici爱旅行', time: '2天前', seed: 'Cici', bg: 'ffdfbf', likes: 45 },
+    { text: '求推荐海边好吃的餐厅', author: 'Max在路上', time: '3天前', seed: 'Max', bg: 'd1f4d1', likes: 12 },
+  ];
+  return `
+    <div class="header"><span class="back-btn" onclick="goBack()">←</span><div class="title">${topic.emoji} ${topic.title}</div><div style="width:22px"></div></div>
+    <div style="padding:16px;text-align:center;color:var(--text-secondary);font-size:13px;margin-bottom:8px">${topic.posts} 篇帖子</div>
+    ${posts.map(p => `
+      <div style="display:flex;gap:10px;padding:14px 16px;background:var(--card-bg);margin-bottom:8px;cursor:pointer" onclick="showToast('查看帖子详情')">
+        <img style="width:36px;height:36px;border-radius:50%;border:2px solid var(--lavender)" src="https://api.dicebear.com/7.x/adventurer/svg?seed=${p.seed}&backgroundColor=${p.bg}" alt="">
+        <div style="flex:1">
+          <div style="font-size:13px;margin-bottom:4px">${p.text}</div>
+          <div style="font-size:11px;color:var(--text-light)">${p.author} · ${p.time} · ❤️ ${p.likes}</div>
+        </div>
+      </div>
+    `).join('')}
+    <div style="padding:16px"><button class="btn btn-primary btn-block" onclick="showToast('发布帖子功能')">✏️ 发布帖子</button></div>
+  `;
+},
+
+// --- 设置 ---
+'settings'() {
+  return `
+    <div class="header"><span class="back-btn" onclick="goBack()">←</span><div class="title">设置</div><div style="width:22px"></div></div>
+    <div class="card">
+      <div class="setting-item"><span class="setting-label">🔔 消息通知</span><div class="toggle-switch on" onclick="toggleSwitch(this)"></div></div>
+      <div class="setting-item"><span class="setting-label">📍 位置服务</span><div class="toggle-switch on" onclick="toggleSwitch(this)"></div></div>
+      <div class="setting-item"><span class="setting-label">🌙 深色模式</span><div class="toggle-switch" onclick="toggleSwitch(this)"></div></div>
+      <div class="setting-item"><span class="setting-label">🔒 隐私保护</span><div class="toggle-switch on" onclick="toggleSwitch(this)"></div></div>
+      <div class="setting-item"><span class="setting-label">💬 新消息预览</span><div class="toggle-switch on" onclick="toggleSwitch(this)"></div></div>
+      <div class="setting-item"><span class="setting-label">🔊 声音提示</span><div class="toggle-switch on" onclick="toggleSwitch(this)"></div></div>
+    </div>
+    <div class="menu-section" style="margin:0 16px 16px;padding:0 16px">
+      <div class="menu-item" onclick="showToast('账号与安全')"><span class="menu-icon">🔐</span><span class="menu-text">账号与安全</span><span class="menu-arrow">›</span></div>
+      <div class="menu-item" onclick="showToast('实名认证')"><span class="menu-icon">🪪</span><span class="menu-text">实名认证</span><span class="menu-arrow">›</span></div>
+      <div class="menu-item" onclick="showToast('版本信息')"><span class="menu-icon">ℹ️</span><span class="menu-text">关于搭伴游 v1.0.0</span><span class="menu-arrow">›</span></div>
+    </div>
+    <div style="padding:16px"><button class="btn btn-secondary btn-block" onclick="showToast('退出登录')">退出登录</button></div>
+  `;
+},
+
+// --- 城市选择 ---
+'city'() {
+  const cities = ['北京','上海','广州','深圳','杭州','成都','重庆','西安','南京','武汉','长沙','厦门','苏州','天津','大连','青岛','三亚','珠海','桂林','昆明'];
+  return `
+    <div class="header"><span class="back-btn" onclick="goBack()">←</span><div class="title">选择城市</div><div style="width:22px"></div></div>
+    <div style="padding:12px 16px"><input class="input-field" placeholder="搜索城市..." oninput="filterCities(this)"></div>
+    <div id="cityListContainer">
+      ${cities.map(c => `<div class="list-item" onclick="selectCity('${c}')"><span class="item-icon">📍</span><span class="item-text">${c === '北京' ? c + ' (当前)' : c}</span></div>`).join('')}
+    </div>
+  `;
+},
+
+// --- 我的行程 ---
+'my-trips'() {
+  const myTrips = [DATA.trips[0], DATA.trips[1]];
+  return `
+    <div class="header"><span class="back-btn" onclick="goBack()">←</span><div class="title">我的行程</div><div style="width:22px"></div></div>
+    <div class="trip-tabs">
+      <div class="trip-tab active" onclick="this.parentElement.querySelectorAll('.trip-tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">进行中</div>
+      <div class="trip-tab" onclick="this.parentElement.querySelectorAll('.trip-tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">已完成</div>
+      <div class="trip-tab" onclick="this.parentElement.querySelectorAll('.trip-tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">已取消</div>
+    </div>
+    <div class="trip-list">
+      ${myTrips.map(t => `
+        <div class="trip-card" onclick="goBack();setTimeout(()=>navTo('trip/${t.id}'),300)">
+          <div class="trip-header"><span class="trip-title">${t.title}</span><span class="status-tag">${t.status}</span></div>
+          <div class="trip-route"><span>${t.from}</span><span class="arrow">→</span><span>${t.to}</span></div>
+          <div class="trip-meta"><span class="meta-item">📅 ${t.date}</span><span class="meta-item">💰 ${t.budget}</span></div>
+        </div>
+      `).join('')}
+    </div>
+    <div style="padding:16px"><button class="btn btn-primary btn-block" onclick="goBack();setTimeout(()=>navTo('trip-create'),300)">＋ 创建新行程</button></div>
+  `;
+},
+
+// --- 我的搭子 ---
+'my-buddies'() {
+  return `
+    <div class="header"><span class="back-btn" onclick="goBack()">←</span><div class="title">我的搭子</div><div style="width:22px"></div></div>
+    <div style="padding:0 16px;margin-bottom:8px"><span style="font-size:13px;color:var(--text-secondary)">共 8 位搭子</span></div>
+    ${DATA.buddies.slice(0, 5).map(b => `
+      <div class="list-item" onclick="goBack();setTimeout(()=>navTo('user/${b.id}'),300)">
+        <img class="avatar avatar-sm" src="https://api.dicebear.com/7.x/adventurer/svg?seed=${b.seed}&backgroundColor=${b.bg}" alt="">
+        <div style="flex:1;margin-left:12px">
+          <div style="font-size:14px;font-weight:600">${b.name}</div>
+          <div style="font-size:11px;color:var(--text-secondary)">${b.sig.substring(0, 20)}...</div>
+        </div>
+        <span class="menu-arrow">›</span>
+      </div>
+    `).join('')}
+  `;
+},
+
+// --- 相册 ---
+'album'() {
+  const emojis = ['🏖️','🎢','🏔️','🌅','🎨','🍜','🌸','🌊','⛺','📸'];
+  return `
+    <div class="header"><span class="back-btn" onclick="goBack()">←</span><div class="title">我的相册</div><div style="width:22px"></div></div>
+    <div class="section-title">📸 旅行照片</div>
+    <div class="album-grid">
+      ${emojis.map(e => `<div class="album-item" style="background:var(--lavender)" onclick="showToast('查看照片')">${e}</div>`).join('')}
+    </div>
+    <div class="section-title">🎬 旅行视频</div>
+    <div class="album-grid">
+      ${['🎬','🎥','📹','🎞️'].map(e => `<div class="album-item" style="background:var(--peach)" onclick="showToast('播放视频')">${e}</div>`).join('')}
+    </div>
+    <div style="padding:16px"><button class="btn btn-primary btn-block" onclick="showToast('上传照片')">📤 上传照片</button></div>
+  `;
+},
+
+// --- 心情总结 ---
+'mood-summary'() {
+  return `
+    <div class="header"><span class="back-btn" onclick="goBack()">←</span><div class="title">🌟 月度心情报告</div><div style="width:22px"></div></div>
+    <div style="text-align:center;padding:30px 16px">
+      <div style="font-size:80px;margin-bottom:16px">🥳</div>
+      <div style="font-size:24px;font-weight:700;color:#66BB6A;margin-bottom:8px">5月：快乐满满</div>
+      <div style="font-size:14px;color:var(--text-secondary);margin-bottom:24px">你这个月参加了 4 次旅行，认识了 8 个新朋友！</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:0 16px;margin-bottom:16px">
+      <div style="padding:16px;background:var(--card-bg);border-radius:16px;text-align:center;box-shadow:var(--shadow)">
+        <div style="font-size:28px;font-weight:700;color:#66BB6A">4</div><div style="font-size:12px;color:var(--text-light)">旅行次数</div>
+      </div>
+      <div style="padding:16px;background:var(--card-bg);border-radius:16px;text-align:center;box-shadow:var(--shadow)">
+        <div style="font-size:28px;font-weight:700;color:#9575CD">8</div><div style="font-size:12px;color:var(--text-light)">认识搭子</div>
+      </div>
+      <div style="padding:16px;background:var(--card-bg);border-radius:16px;text-align:center;box-shadow:var(--shadow)">
+        <div style="font-size:28px;font-weight:700;color:#FF8A65">95%</div><div style="font-size:12px;color:var(--text-light)">好评率</div>
+      </div>
+      <div style="padding:16px;background:var(--card-bg);border-radius:16px;text-align:center;box-shadow:var(--shadow)">
+        <div style="font-size:28px;font-weight:700;color:#64B5F6">3</div><div style="font-size:12px;color:var(--text-light)">心情记录</div>
+      </div>
+    </div>
+    <div class="card"><h4 style="margin-bottom:12px">😊 本周心情趋势</h4>
+      <div style="display:flex;align-items:flex-end;gap:6px;height:80px">
+        ${[60,80,40,90,70,95,85].map((h,i) => `<div style="flex:1;height:${h}%;background:var(--gradient-primary);border-radius:8px 8px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:4px"><span style="font-size:16px">${['😊','😤','😴','🤩','😊','🥳','😊'][i]}</span></div>`).join('')}
+      </div>
+      <div style="display:flex;gap:6px;margin-top:4px">${['一','二','三','四','五','六','日'].map(d => `<div style="flex:1;text-align:center;font-size:10px;color:var(--text-light)">${d}</div>`).join('')}</div>
+    </div>
+  `;
+},
+
+// --- 性格测试 ---
+'quiz'() {
+  const questions = [
+    { q: '你更喜欢哪种旅行方式？', options: ['🎒 穷游，背包就走','🏨 舒适型，住好酒店','🚗 自驾，自由掌控','🗺️ 深度游，慢节奏'] },
+    { q: '旅行中你最在意什么？', options: ['📸 拍照出片','🍜 吃到美食','👥 认识朋友','🧘 放松身心'] },
+    { q: '你理想的旅行搭子是？', options: ['😄 开朗活泼型','🤓 靠谱策划型','🎨 文艺浪漫型','💪 行动力强型'] },
+  ];
+  let qHtml = questions.map((q, i) => `
+    <div class="quiz-section" id="quizQ${i}">
+      <div class="quiz-header"><div class="quiz-title">🎯 性格测试</div><div class="quiz-progress">Q${i+1}/${questions.length}</div></div>
+      <div class="quiz-question">${q.q}</div>
+      <div class="quiz-options">
+        ${q.options.map((o, j) => `<div class="quiz-option ${i===0 && j===0 ? 'selected' : ''}" onclick="selectQuiz(this, ${i}, ${questions.length})">${o}</div>`).join('')}
+      </div>
+      ${i < questions.length - 1 ? `<div style="padding:16px 0;text-align:center"><button class="btn btn-primary" onclick="document.getElementById('quizQ${i}').style.display='none';document.getElementById('quizQ${i+1}').style.display='block'">下一题 →</button></div>` : '<div style="padding:16px 0;text-align:center"><button class="btn btn-warm" onclick="showToast(\'🎉 测试完成！你的旅行风格是：探索者\');goBack()">查看结果</button></div>'}
+    </div>
+  `).join('');
+  return `
+    <div class="header"><span class="back-btn" onclick="goBack()">←</span><div class="title">性格测试</div><div style="width:22px"></div></div>
+    ${qHtml}
+  `;
+},
+
+// --- 心情记录 ---
+'mood/:date'(param) {
+  const moodData = DATA.moodDays[param];
+  const records = moodData ? moodData.records : [];
+  const existingEmoji = moodData ? moodData.emoji : '😊';
+  const existingText = records.length > 0 ? records.map(r => r.text).join('\\n') : '';
+  return `
+    <div class="header"><span class="back-btn" onclick="goBack()">←</span><div class="title">📝 5月${param}日 · 心情记录</div><div style="width:22px"></div></div>
+    <div style="text-align:center;padding:20px"><div style="font-size:48px;margin-bottom:8px">${existingEmoji}</div><div style="font-size:14px;color:var(--text-secondary)">选择今天的心情</div></div>
+    <div class="mood-grid" style="padding:0 16px;margin-bottom:16px">
+      <div class="mood-item ${existingEmoji==='😊'?'active':''}" onclick="selectMood(this, '😊', '开心')"><span class="mood-icon">😊</span><span class="mood-label">开心</span></div>
+      <div class="mood-item ${existingEmoji==='😤'?'active':''}" onclick="selectMood(this, '😤', '想释放')"><span class="mood-icon">😤</span><span class="mood-label">想释放</span></div>
+      <div class="mood-item ${existingEmoji==='😴'?'active':''}" onclick="selectMood(this, '😴', '想放松')"><span class="mood-icon">😴</span><span class="mood-label">想放松</span></div>
+      <div class="mood-item ${existingEmoji==='🤩'?'active':''}" onclick="selectMood(this, '🤩', '想冒险')"><span class="mood-icon">🤩</span><span class="mood-label">想冒险</span></div>
+    </div>
+    <div style="padding:0 16px;margin-bottom:16px">
+      <textarea class="input-field" placeholder="写下今天的心情..." style="min-height:100px">${existingText}</textarea>
+    </div>
+    ${records.length > 0 ? `<div class="card"><h4 style="margin-bottom:8px">📝 今日记录</h4>${records.map(r => `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;font-size:13px;color:var(--text-secondary)"><span>${r.emoji}</span><span>${r.text}</span></div>`).join('')}</div>` : ''}
+    <div style="padding:0 16px"><button class="btn btn-primary btn-block" onclick="showToast('✅ 心情已记录');goBack()">保存心情</button></div>
+  `;
+},
+
+};
+
+// ===== 工具函数 =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove('show'), 1500);
+}
+
+function selectMood(el, emoji, label) {
+  el.parentElement.querySelectorAll('.mood-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  showToast(emoji + ' ' + label);
+}
+
+function selectFilter(el, name) {
+  el.parentElement.querySelectorAll('.filter-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  showToast('筛选: ' + name);
+}
+
+function selectChip(el) {
+  el.parentElement.querySelectorAll('.chip').forEach(i => { i.classList.remove('chip-active'); i.classList.add('chip-default'); });
+  el.classList.remove('chip-default');
+  el.classList.add('chip-active');
+}
+
+function toggleSwitch(el) {
+  el.classList.toggle('on');
+  const label = el.parentElement.querySelector('.setting-label')?.textContent || '';
+  showToast(label + (el.classList.contains('on') ? ' 已开启' : ' 已关闭'));
+}
+
+function selectQuiz(el, qi, total) {
+  el.parentElement.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectCity(city) {
+  document.getElementById('cityDisplay').textContent = city;
+  goBack();
+  showToast('📍 已切换到 ' + city);
+}
+
+function filterCities(input) {
+  const q = input.value.toLowerCase();
+  document.querySelectorAll('#cityListContainer .list-item').forEach(item => {
+    item.style.display = item.textContent.includes(input.value) ? '' : 'none';
+  });
+}
+
+function switchTripTab(el, mode) {
+  el.parentElement.querySelectorAll('.trip-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderTrips(mode === 'mine');
+}
+
+function toggleJoin(btn) {
+  if (btn.classList.contains('joined')) {
+    btn.classList.remove('joined');
+    btn.textContent = '我要报名';
+    showToast('已取消报名');
+  } else {
+    btn.classList.add('joined');
+    btn.textContent = '已报名 ✓';
+    showToast('🎉 报名成功！');
+  }
+}
+
+function likeBuddy(el, buddyId) {
+  el.classList.add('liked');
+  el.querySelector('.btn-icon').textContent = '❤️';
+  el.style.color = '#FF4081';
+  showToast('❤️ 已喜欢');
+}
+
+function sendChatMsg() {
+  const input = document.getElementById('chatInput');
+  if (!input || !input.value.trim()) return;
+  const container = document.getElementById('chatMsgContainer');
+  const msgHtml = `<div class="msg self"><img class="msg-avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Me&backgroundColor=b6e3f4" alt=""><div><div class="msg-bubble">${input.value}</div><div class="msg-time" style="text-align:right">刚刚</div></div></div>`;
+  container.insertAdjacentHTML('beforeend', msgHtml);
+  input.value = '';
+  container.scrollTop = container.scrollHeight;
+  // 自动回复
+  setTimeout(() => {
+    const replies = ['好的！😊','收到啦','没问题～','期待！','好呀好呀'];
+    const reply = replies[Math.floor(Math.random() * replies.length)];
+    const replyHtml = `<div class="msg other"><img class="msg-avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Annie&backgroundColor=b6e3f4" alt=""><div><div class="msg-bubble">${reply}</div><div class="msg-time">刚刚</div></div></div>`;
+    container.insertAdjacentHTML('beforeend', replyHtml);
+    container.scrollTop = container.scrollHeight;
+  }, 1000);
+}
+
+// ===== 渲染函数 =====
+function renderBuddies() {
+  const container = document.getElementById('buddyList');
+  container.innerHTML = DATA.buddies.map(b => `
+    <div class="buddy-card">
+      <div class="card-header">
+        <span class="distance">📍 ${b.distance}</span>
+        <span class="match" onclick="event.stopPropagation();showToast('匹配度 ${b.match}%')">匹配度 ${b.match}%</span>
+      </div>
+      <div class="card-main" onclick="navTo('user/${b.id}')">
+        <div class="avatar-wrapper">
+          <img class="avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=${b.seed}&backgroundColor=${b.bg}" alt="">
+          <span class="verified" onclick="event.stopPropagation();showToast('已实名认证 ✓')">✓</span>
+        </div>
+        <div class="info">
+          <div class="name-row">
+            <span class="nickname">${b.name}</span>
+            <span class="age">${b.age}岁</span>
+            <span class="gender ${b.gender}">${b.gender === 'female' ? '♀' : '♂'}</span>
+          </div>
+          <div class="signature">${b.sig}</div>
+        </div>
+      </div>
+      <div class="tags">${b.tags.map(t => `<span class="chip ${t.cls}" onclick="event.stopPropagation();showToast('筛选: ${t.text}')">${t.text}</span>`).join('')}</div>
+      <div class="card-actions">
+        <div class="action-btn btn-pass" onclick="showToast('已跳过 ✕')"><span class="btn-icon">✕</span><span>不感兴趣</span></div>
+        <div class="action-btn btn-like" onclick="likeBuddy(this, '${b.id}')"><span class="btn-icon">♥</span><span>喜欢</span></div>
+        <div class="action-btn btn-sayhi" onclick="navTo('chat/${b.id}')"><span class="btn-icon">💬</span><span>打招呼</span></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderTrips(mine = false) {
+  const container = document.getElementById('tripList');
+  const trips = mine ? DATA.trips.slice(0, 2) : DATA.trips;
+  container.innerHTML = trips.map(t => {
+    const author = DATA.buddies.find(b => b.id === t.author) || DATA.buddies[0];
+    return `
+      <div class="trip-card" onclick="navTo('trip/${t.id}')">
+        <div class="trip-header"><span class="trip-title">${t.title}</span><span class="status-tag">${t.status}</span></div>
+        <div class="trip-route"><span>${t.from}</span><span class="arrow">→</span><span>${t.to}</span></div>
+        <div class="trip-meta"><span class="meta-item">📅 ${t.date}</span><span class="meta-item">💰 ${t.budget}</span></div>
+        <div class="trip-footer">
+          <div class="author-info" onclick="event.stopPropagation();navTo('user/${author.id}')">
+            <img class="author-avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=${author.seed}&backgroundColor=${author.bg}" alt="">
+            <span>${author.name}</span>
+          </div>
+          <button class="join-btn" onclick="event.stopPropagation();toggleJoin(this)">我要报名</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderChats() {
+  const container = document.getElementById('chatList');
+  container.innerHTML = DATA.chats.map(c => `
+    <div class="chat-item" onclick="navTo('chat/${c.id}')">
+      <div class="avatar-wrap">
+        <img class="avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=${c.seed}&backgroundColor=${c.bg}" alt="">
+        ${c.unread > 0 ? `<span class="unread-badge">${c.unread}</span>` : ''}
+      </div>
+      <div class="chat-info">
+        <div class="chat-header"><span class="chat-name">${c.name}</span><span class="chat-time">${c.time}</span></div>
+        <div class="last-msg">${c.lastMsg}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderTopics() {
+  const container = document.getElementById('topicsList');
+  container.innerHTML = DATA.topics.map(t => `
+    <div class="topic-card" onclick="navTo('topic/${t.id}')">
+      <div class="topic-img" style="background:${t.bg}">${t.emoji}</div>
+      <div class="topic-info">
+        <div class="topic-title">${t.title}</div>
+        <div class="topic-posts">${t.posts} 篇帖子</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderCalendar() {
+  const grid = document.getElementById('calendarGrid');
+  const days = ['一','二','三','四','五','六','日'];
+  let html = days.map(d => `<div class="day-name">${d}</div>`).join('');
+  // 5月1日开始是周五，前面空4天
+  html += '<div class="day empty"></div><div class="day empty"></div><div class="day empty"></div><div class="day empty"></div>';
+  for (let i = 1; i <= 31; i++) {
+    const mood = DATA.moodDays[i];
+    const isToday = i === 23;
+    const cls = mood ? `day has-mood mood-${mood.mood}` : 'day';
+    const todayCls = isToday ? ' today' : '';
+    html += `<div class="${cls}${todayCls}" onclick="${mood ? `navTo('mood/${i}')` : `showToast('5月${i}日')`}">${i}</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+// ===== 初始化 =====
+function init() {
+  Router.init();
+  renderBuddies();
+  renderTrips();
+  renderChats();
+  renderTopics();
+  renderCalendar();
+}
+
+init();
+</script>
+</body>
+</html>

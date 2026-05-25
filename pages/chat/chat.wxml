@@ -1,0 +1,46 @@
+<!--pages/chat/chat.wxml-->
+<view class="container">
+  <!-- 对话列表 -->
+  <view wx:if="{{!currentChatId}}" class="conversation-list">
+    <view class="conversation-item" wx:for="{{conversations}}" wx:key="id" bindtap="enterChat" data-id="{{item.id}}">
+      <view class="conv-avatar">
+        <text>{{item.name.substring(0, 1)}}</text>
+      </view>
+      <view class="conv-info">
+        <view class="conv-header">
+          <text class="conv-name">{{item.name}}</text>
+          <text class="conv-time">{{item.time}}</text>
+        </view>
+        <view class="conv-last-message">
+          <text>{{item.lastMessage}}</text>
+          <view class="unread-badge" wx:if="{{item.unread > 0}}">{{item.unread}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 聊天窗口 -->
+  <view wx:else class="chat-window">
+    <!-- 聊天头部 -->
+    <view class="chat-header">
+      <view class="back-btn" bindtap="backToConversations">←</view>
+      <text class="chat-title">{{conversations[0].name}}</text>
+    </view>
+
+    <!-- 消息列表 -->
+    <scroll-view class="message-list" scroll-y scroll-into-view="msg-{{messages[messages.length-1]?.id}}">
+      <view class="message-item {{item.isSelf ? 'self' : 'other'}}" wx:for="{{messages}}" wx:key="id" id="msg-{{item.id}}">
+        <view class="message-bubble">
+          <text class="message-content">{{item.content}}</text>
+          <text class="message-time">{{item.time}}</text>
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- 输入框 -->
+    <view class="chat-input">
+      <input class="input-field" value="{{inputValue}}" bindinput="onInputChange" placeholder="输入消息..." confirm-type="send" bindconfirm="sendMessage" />
+      <button class="send-btn" bindtap="sendMessage">发送</button>
+    </view>
+  </view>
+</view>

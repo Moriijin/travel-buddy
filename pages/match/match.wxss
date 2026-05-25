@@ -1,0 +1,187 @@
+/* pages/match/match.wxss */
+
+.filters {
+  display: flex;
+  gap: 20rpx;
+  margin-bottom: 30rpx;
+}
+
+.filter-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20rpx;
+  background: #f9f9f9;
+  border-radius: 16rpx;
+}
+
+.filter-label {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+
+.filter-value {
+  font-size: 28rpx;
+  color: #333;
+}
+
+/* 匹配区域 */
+.match-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.candidate-card {
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 40rpx;
+  box-shadow: 0 8rpx 24rpx rgba(181, 166, 230, 0.2);
+  margin-bottom: 40rpx;
+}
+
+.candidate-avatar {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #B5A6E6, #E8B4F8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 64rpx;
+  font-weight: bold;
+  margin: 0 auto 30rpx;
+}
+
+.candidate-info {
+  text-align: center;
+}
+
+.candidate-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20rpx;
+  margin-bottom: 16rpx;
+}
+
+.candidate-name {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.match-score {
+  font-size: 28rpx;
+  color: #B5A6E6;
+  background: rgba(181, 166, 230, 0.1);
+  padding: 8rpx 20rpx;
+  border-radius: 40rpx;
+}
+
+.candidate-detail {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.candidate-bio {
+  font-size: 26rpx;
+  color: #999;
+  margin: 20rpx 0;
+  line-height: 1.6;
+}
+
+.candidate-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10rpx;
+  margin-top: 20rpx;
+}
+
+.tag {
+  padding: 8rpx 20rpx;
+  border-radius: 40rpx;
+  background: rgba(181, 166, 230, 0.1);
+  color: #B5A6E6;
+  font-size: 24rpx;
+}
+
+/* 匹配中状态 */
+.matching-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+}
+
+.loading-spinner {
+  font-size: 80rpx;
+  margin-bottom: 30rpx;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.matching-text {
+  font-size: 30rpx;
+  color: #999;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  display: flex;
+  gap: 20rpx;
+  justify-content: center;
+  padding: 0 40rpx;
+}
+
+.btn-skip {
+  flex: 1;
+  background: #ffffff;
+  color: #999;
+  border: 2rpx solid #eee;
+  border-radius: 40rpx;
+  padding: 24rpx;
+  font-size: 28rpx;
+}
+
+.btn-like {
+  flex: 1;
+  background: linear-gradient(135deg, #B5A6E6, #E8B4F8);
+  color: #ffffff;
+  border: none;
+  border-radius: 40rpx;
+  padding: 24rpx;
+  font-size: 28rpx;
+}
+
+.btn-details {
+  flex: 1;
+  background: #f9f9f9;
+  color: #666;
+  border: none;
+  border-radius: 40rpx;
+  padding: 24rpx;
+  font-size: 28rpx;
+}
+
+/* 开始匹配按钮 */
+.btn-start-match {
+  width: 80%;
+  margin: 100rpx auto 0;
+  background: linear-gradient(135deg, #B5A6E6, #E8B4F8);
+  color: #ffffff;
+  border: none;
+  border-radius: 40rpx;
+  padding: 32rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+}
