@@ -4,7 +4,9 @@
     "pages/profile/profile",
     "pages/match/match",
     "pages/chat/chat",
-    "pages/travel-plan/travel-plan"
+    "pages/travel-plan/travel-plan",
+    "pages/discover/discover",
+    "pages/trip/trip"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -22,19 +24,27 @@
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "首页"
+        "text": "首页",
+        "iconPath": "icons/tab-home.png",
+        "selectedIconPath": "icons/tab-home-selected.png"
       },
       {
         "pagePath": "pages/match/match",
-        "text": "匹配"
+        "text": "匹配",
+        "iconPath": "icons/tab-match.png",
+        "selectedIconPath": "icons/tab-match-selected.png"
       },
       {
         "pagePath": "pages/chat/chat",
-        "text": "聊天"
+        "text": "聊天",
+        "iconPath": "icons/tab-chat.png",
+        "selectedIconPath": "icons/tab-chat-selected.png"
       },
       {
         "pagePath": "pages/profile/profile",
-        "text": "我的"
+        "text": "我的",
+        "iconPath": "icons/tab-profile.png",
+        "selectedIconPath": "icons/tab-profile-selected.png"
       }
     ]
   },

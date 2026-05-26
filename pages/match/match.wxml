@@ -10,16 +10,23 @@
   <scroll-view class="scroll-content" scroll-y enhanced>
     <!-- 筛选条件 -->
     <view class="filters-wrap">
-      <view class="filter-btn" bindtap="selectDestination">
-        <text class="filter-label">目的地</text>
-        <text class="filter-value">选择目的地</text>
-        <text class="filter-arrow">›</text>
-      </view>
-      <view class="filter-btn" bindtap="selectTravelDate">
-        <text class="filter-label">出行时间</text>
-        <text class="filter-value">选择时间</text>
-        <text class="filter-arrow">›</text>
-      </view>
+      <!-- 目的地 picker -->
+      <picker mode="selector" range="{{destinationList}}" value="{{destinationIndex}}" bindchange="onDestinationChange">
+        <view class="filter-btn">
+          <text class="filter-label">目的地</text>
+          <text class="filter-value">{{filters.destination || '选择目的地'}}</text>
+          <text class="filter-arrow">›</text>
+        </view>
+      </picker>
+
+      <!-- 出行时间 picker -->
+      <picker mode="date" value="{{filters.travelDate}}" start="2026-05-01" end="2027-12-31" bindchange="onDateChange">
+        <view class="filter-btn">
+          <text class="filter-label">出行时间</text>
+          <text class="filter-value">{{filters.travelDate || '选择时间'}}</text>
+          <text class="filter-arrow">›</text>
+        </view>
+      </picker>
     </view>
 
     <!-- 匹配卡片区域 -->

@@ -194,7 +194,7 @@
   gap: 16rpx;
 }
 
-/* 自己消息 - 靠右对齐，隐藏头像 */
+/* 自己消息 - 靠右对齐 */
 .message-item.self {
   flex-direction: row-reverse;
   justify-content: flex-end;
@@ -204,7 +204,7 @@
   flex-direction: row;
 }
 
-/* 消息头像 */
+/* 消息头像 - 双方都有 */
 .msg-avatar {
   width: 72rpx;
   height: 72rpx;
@@ -216,9 +216,10 @@
   margin-top: 10rpx;
 }
 
-/* 自己消息不显示头像 */
+/* 自己消息头像 */
 .message-item.self .msg-avatar {
-  display: none;
+  background: linear-gradient(135deg, #C5B8E6, #A3CFFF);
+  border: none;
 }
 
 /* 对方消息头像 */
@@ -227,6 +228,7 @@
   height: 72rpx;
   flex-shrink: 0;
   align-self: flex-end;
+  border: 3rpx solid var(--lavender);
 }
 
 .other-avatar {

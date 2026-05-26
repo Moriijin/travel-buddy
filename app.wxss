@@ -39,6 +39,7 @@ page {
   background: linear-gradient(135deg, #C5B8E6, #A3CFFF);
   color: white;
   padding: 20rpx 32rpx;
+  padding-top: calc(20rpx + env(safe-area-inset-top));
   display: flex;
   justify-content: space-between;
   align-items: center;

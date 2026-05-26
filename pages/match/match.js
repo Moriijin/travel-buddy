@@ -8,6 +8,8 @@ Page({
       gender: 'all',
       interests: []
     },
+    destinationList: ['云南大理', '四川稻城', '西藏拉萨', '新疆喀纳斯', '湖南张家界', '广西桂林', '贵州黄果果树', '海南三亚', '福建厦门', '浙江杭州'],
+    destinationIndex: -1,
     candidates: [],
     currentCandidate: null,
     isMatching: false,
@@ -85,34 +87,18 @@ Page({
   },
 
   // 选择目的地
-  selectDestination() {
-    wx.showModal({
-      title: '选择目的地',
-      editable: true,
-      placeholderText: '输入你想去的目的地',
-      success: (res) => {
-        if (res.confirm && res.content) {
-          this.setData({
-            'filters.destination': res.content
-          });
-        }
-      }
+  onDestinationChange(e) {
+    const index = e.detail.value;
+    this.setData({
+      destinationIndex: index,
+      'filters.destination': this.data.destinationList[index]
     });
   },
 
   // 选择旅行时间
-  selectTravelDate() {
-    wx.showModal({
-      title: '选择出行时间',
-      editable: true,
-      placeholderText: '例如：2026-07-01 ~ 2026-07-10',
-      success: (res) => {
-        if (res.confirm && res.content) {
-          this.setData({
-            'filters.travelDate': res.content
-          });
-        }
-      }
+  onDateChange(e) {
+    this.setData({
+      'filters.travelDate': e.detail.value
     });
   },
 
@@ -121,8 +107,8 @@ Page({
     wx.showActionSheet({
       itemList: ['选择目的地', '选择出行时间', '设置年龄范围'],
       success: (res) => {
-        if (res.tapIndex === 0) this.selectDestination();
-        else if (res.tapIndex === 1) this.selectTravelDate();
+        // 用户点击了选项，但实际已经通过 picker 处理
+        // 这里可以添加更多筛选逻辑
       }
     });
   },

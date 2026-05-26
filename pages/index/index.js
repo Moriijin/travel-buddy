@@ -6,6 +6,8 @@ Page({
     userInfo: null,
     isLogin: false,
     city: '北京',
+    cityIndex: 0,
+    cityList: ['北京', '上海', '广州', '深圳', '成都', '杭州', '重庆', '武汉', '西安', '南京', '长沙', '厦门'],
     currentMood: 0,
     activeFilter: 0,
     isRefreshing: false,
@@ -126,6 +128,15 @@ Page({
   goToProfile() {
     wx.switchTab({
       url: '/pages/profile/profile'
+    });
+  },
+
+  // 选择城市
+  onCityChange(e) {
+    const index = e.detail.value;
+    this.setData({
+      cityIndex: index,
+      city: this.data.cityList[index]
     });
   },
 

@@ -1,11 +1,16 @@
 <!--pages/index/index.wxml-->
 <view class="container">
 
-  <!-- 顶部导航 - 紫色渐变背景 -->
+  <!-- 顶部导航 - 紫色渐变背景 + 安全区域 -->
   <view class="header">
     <view class="header-left">
-      <text class="icon-btn">📍</text>
-      <text class="city-text">{{city}}</text>
+      <picker mode="selector" range="{{cityList}}" value="{{cityIndex}}" bindchange="onCityChange">
+        <view class="city-picker">
+          <text class="icon-btn">📍</text>
+          <text class="city-text">{{city}}</text>
+          <text class="picker-arrow">▼</text>
+        </view>
+      </picker>
     </view>
     <view class="header-right">
       <text class="icon-btn" bindtap="showNotifications">🔔</text>
