@@ -9,15 +9,15 @@
 
   <scroll-view class="scroll-content" scroll-y enhanced>
     <!-- 筛选条件 -->
-    <view class="filters card">
-      <view class="filter-item" bindtap="selectDestination">
+    <view class="filters-wrap">
+      <view class="filter-btn" bindtap="selectDestination">
         <text class="filter-label">目的地</text>
-        <text class="filter-value">{{filters.destination || '选择目的地'}}</text>
+        <text class="filter-value">选择目的地</text>
         <text class="filter-arrow">›</text>
       </view>
-      <view class="filter-item" bindtap="selectTravelDate">
+      <view class="filter-btn" bindtap="selectTravelDate">
         <text class="filter-label">出行时间</text>
-        <text class="filter-value">{{filters.travelDate || '选择时间'}}</text>
+        <text class="filter-value">选择时间</text>
         <text class="filter-arrow">›</text>
       </view>
     </view>
@@ -26,22 +26,22 @@
     <view class="match-area">
       <!-- Buddy Card -->
       <view class="buddy-card" wx:if="{{currentCandidate && !isMatching}}">
-        <!-- 顶部渐变条 -->
+        <!-- 顶部渐变区 -->
         <view class="card-gradient-top"></view>
 
         <!-- 头像 + 认证标记 + 基础信息 -->
         <view class="card-top">
           <view class="avatar-wrapper">
-            <view class="avatar avatar-lg" style="background: {{currentCandidate.avatarColor}}">
+            <view class="avatar-card" style="background: {{currentCandidate.avatarColor}}">
               <text class="avatar-text">{{currentCandidate.name.substring(0, 1)}}</text>
             </view>
-            <view class="verified" wx:if="{{currentCandidate.verified}}">✓</view>
+            <view class="verified-badge" wx:if="{{currentCandidate.verified}}">✓</view>
           </view>
           <view class="card-identity">
             <view class="identity-row">
               <text class="nickname">{{currentCandidate.name}}</text>
               <text class="age">{{currentCandidate.age}}岁</text>
-              <text class="gender">{{currentCandidate.gender}}</text>
+              <view class="gender-tag">{{currentCandidate.gender}}</view>
             </view>
             <view class="match-score-badge">
               <text class="score-text">{{currentCandidate.matchScore}}% 匹配</text>

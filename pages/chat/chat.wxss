@@ -119,11 +119,11 @@
   background: var(--bg);
 }
 
-/* 聊天头部 */
+/* 聊天头部 - 紫色渐变 */
 .chat-header {
   display: flex;
   align-items: center;
-  padding: 20rpx 32rpx;
+  padding: 24rpx 32rpx;
   background: var(--gradient-primary);
   color: white;
   position: sticky;
@@ -132,9 +132,9 @@
 }
 
 .back-btn {
-  font-size: 48rpx;
+  font-size: 44rpx;
   color: white;
-  padding: 0 16rpx;
+  padding: 0 20rpx;
   line-height: 1;
   transition: transform 0.2s;
 }
@@ -163,7 +163,7 @@
 }
 
 .header-more {
-  font-size: 44rpx;
+  font-size: 40rpx;
   color: white;
   padding: 0 8rpx;
 }
@@ -231,13 +231,15 @@
   word-wrap: break-word;
 }
 
+/* 自己消息 - 紫色渐变气泡 */
 .message-item.self .message-bubble {
-  background: var(--gradient-primary);
+  background: linear-gradient(135deg, #A3CFFF, #C5B8E6);
   color: white;
   border-radius: 32rpx 32rpx 8rpx 32rpx;
-  box-shadow: 0 6rpx 20rpx rgba(163, 207, 255, 0.35);
+  box-shadow: 0 6rpx 20rpx rgba(163, 207, 255, 0.3);
 }
 
+/* 对方消息 - 白色卡片气泡 */
 .message-item.other .message-bubble {
   background: var(--card-bg);
   color: var(--text-primary);
