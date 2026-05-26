@@ -4,7 +4,8 @@ Page({
     conversations: [],
     currentChatId: null,
     messages: [],
-    inputValue: ''
+    inputValue: '',
+    scrollToBottom: ''
   },
 
   onLoad() {
@@ -73,7 +74,10 @@ Page({
       }
     ];
 
-    this.setData({ messages: mockMessages });
+    this.setData({ 
+      messages: mockMessages,
+      scrollToBottom: 'msg-' + mockMessages[mockMessages.length - 1].id
+    });
   },
 
   // 发送消息
@@ -90,7 +94,8 @@ Page({
 
     this.setData({
       messages: [...this.data.messages, newMessage],
-      inputValue: ''
+      inputValue: '',
+      scrollToBottom: 'msg-' + newMessage.id
     });
 
     // TODO: 发送到服务器

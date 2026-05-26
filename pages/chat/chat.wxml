@@ -28,7 +28,7 @@
     </view>
 
     <!-- 消息列表 -->
-    <scroll-view class="message-list" scroll-y scroll-into-view="msg-{{messages[messages.length-1]?.id}}">
+    <scroll-view class="message-list" scroll-y scroll-into-view="{{scrollToBottom}}">
       <view class="message-item {{item.isSelf ? 'self' : 'other'}}" wx:for="{{messages}}" wx:key="id" id="msg-{{item.id}}">
         <view class="message-bubble">
           <text class="message-content">{{item.content}}</text>
