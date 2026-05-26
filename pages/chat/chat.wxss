@@ -171,7 +171,7 @@
 /* 消息列表 */
 .message-list {
   flex: 1;
-  padding: 30rpx 32rpx;
+  padding: 20rpx 24rpx;
 }
 
 .message-date {
@@ -190,12 +190,14 @@
 .message-item {
   display: flex;
   align-items: flex-start;
-  margin-bottom: 28rpx;
+  margin-bottom: 32rpx;
   gap: 16rpx;
 }
 
+/* 自己消息 - 靠右对齐，隐藏头像 */
 .message-item.self {
   flex-direction: row-reverse;
+  justify-content: flex-end;
 }
 
 .message-item.other {
@@ -212,6 +214,19 @@
   align-items: center;
   justify-content: center;
   margin-top: 10rpx;
+}
+
+/* 自己消息不显示头像 */
+.message-item.self .msg-avatar {
+  display: none;
+}
+
+/* 对方消息头像 */
+.message-item.other .msg-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  flex-shrink: 0;
+  align-self: flex-end;
 }
 
 .other-avatar {
@@ -233,7 +248,7 @@
 
 /* 自己消息 - 紫色渐变气泡 */
 .message-item.self .message-bubble {
-  background: linear-gradient(135deg, #A3CFFF, #C5B8E6);
+  background: linear-gradient(135deg, #C5B8E6, #A3CFFF);
   color: white;
   border-radius: 32rpx 32rpx 8rpx 32rpx;
   box-shadow: 0 6rpx 20rpx rgba(163, 207, 255, 0.3);
@@ -267,7 +282,7 @@
   align-items: center;
   padding: 20rpx 32rpx;
   background: var(--card-bg);
-  border-top: 1rpx solid rgba(197, 184, 230, 0.15);
+  border-top: 1px solid rgba(197, 184, 230, 0.15);
   gap: 20rpx;
 }
 

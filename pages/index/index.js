@@ -122,9 +122,9 @@ Page({
     this.setData({ buddies });
   },
 
-  // 跳转个人资料
+  // 跳转个人资料（TabBar 页面用 switchTab）
   goToProfile() {
-    wx.navigateTo({
+    wx.switchTab({
       url: '/pages/profile/profile'
     });
   },
@@ -141,11 +141,11 @@ Page({
     this.setData({ activeFilter: index });
   },
 
-  // 筛选行程
+  // 筛选行程（TabBar 页面用 switchTab）
   filterTrips(e) {
     const status = e.currentTarget.dataset.status;
-    wx.navigateTo({
-      url: `/pages/trip/trip?status=${status}`
+    wx.switchTab({
+      url: '/pages/trip/trip'
     });
   },
 
@@ -186,7 +186,7 @@ Page({
     });
   },
 
-  // 打招呼
+  // 打招呼（TabBar 页面用 switchTab）
   sayHi(e) {
     const id = e.currentTarget.dataset.id;
     if (!this.data.isLogin) {
@@ -196,16 +196,20 @@ Page({
       });
       return;
     }
-    wx.navigateTo({
-      url: `/pages/chat/chat?id=${id}`
+    // 保存当前聊天的 ID 到全局状态
+    app.globalData.currentChatId = id;
+    wx.switchTab({
+      url: '/pages/chat/chat'
     });
   },
 
-  // 查看旅伴详情
+  // 查看旅伴详情（TabBar 页面用 switchTab）
   viewTravelMate(e) {
     const id = e.currentTarget.dataset.id;
-    wx.navigateTo({
-      url: `/pages/profile/profile?id=${id}`
+    // 保存查看的用户 ID 到全局状态
+    app.globalData.currentUserId = id;
+    wx.switchTab({
+      url: '/pages/profile/profile'
     });
   },
 

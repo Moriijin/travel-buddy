@@ -1,4 +1,5 @@
 {
   "navigationBarTitleText": "智能匹配",
-  "usingComponents": {}
+  "usingComponents": {},
+  "navigationStyle": "custom"
 }

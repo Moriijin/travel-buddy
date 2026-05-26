@@ -1,4 +1,5 @@
 {
   "usingComponents": {},
-  "navigationBarTitleText": "行程"
+  "navigationBarTitleText": "行程",
+  "navigationStyle": "custom"
 }

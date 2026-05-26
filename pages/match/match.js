@@ -196,10 +196,12 @@ Page({
     }
   },
 
-  // 查看详情
+  // 查看详情（TabBar 页面用 switchTab）
   viewDetails() {
-    wx.navigateTo({
-      url: `/pages/profile/profile?id=${this.data.currentCandidate.id}`
+    // 保存当前查看的用户 ID 到全局状态
+    getApp().globalData.currentUserId = this.data.currentCandidate.id;
+    wx.switchTab({
+      url: '/pages/profile/profile'
     });
   }
 });
