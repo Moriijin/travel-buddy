@@ -22,27 +22,19 @@
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "首页",
-        "iconPath": "assets/icons/home.png",
-        "selectedIconPath": "assets/icons/home-active.png"
+        "text": "首页"
       },
       {
         "pagePath": "pages/match/match",
-        "text": "匹配",
-        "iconPath": "assets/icons/match.png",
-        "selectedIconPath": "assets/icons/match-active.png"
+        "text": "匹配"
       },
       {
         "pagePath": "pages/chat/chat",
-        "text": "聊天",
-        "iconPath": "assets/icons/chat.png",
-        "selectedIconPath": "assets/icons/chat-active.png"
+        "text": "聊天"
       },
       {
         "pagePath": "pages/profile/profile",
-        "text": "我的",
-        "iconPath": "assets/icons/profile.png",
-        "selectedIconPath": "assets/icons/profile-active.png"
+        "text": "我的"
       }
     ]
   },
