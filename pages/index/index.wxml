@@ -1,59 +1,142 @@
 <!--pages/index/index.wxml-->
 <view class="container">
-  <!-- 顶部欢迎区 -->
+
+  <!-- 顶部导航 - 紫色渐变背景 -->
   <view class="header">
-    <view class="greeting">
-      <text class="title">找到你的旅伴</text>
-      <text class="subtitle">一起探索世界的美好</text>
+    <view class="header-left">
+      <text class="icon-btn">📍</text>
+      <text class="city-text">{{city}}</text>
     </view>
-    <view class="avatar-wrapper" bindtap="goToProfile">
-      <view class="avatar">
+    <view class="header-right">
+      <text class="icon-btn" bindtap="showNotifications">🔔</text>
+    </view>
+  </view>
+
+  <!-- 欢迎回来区域 - 白色卡片，圆角底部 -->
+  <view class="welcome-back" bindtap="goToProfile">
+    <view class="welcome-avatar-wrapper">
+      <view class="welcome-avatar">
         <text wx:if="{{userInfo && userInfo.name}}">{{userInfo.name.substring(0, 1)}}</text>
         <text wx:else>我</text>
       </view>
     </view>
-  </view>
-
-  <!-- 快速操作 -->
-  <view class="quick-actions card">
-    <view class="action-item" bindtap="startMatch">
-      <view class="action-icon">🔍</view>
-      <text class="action-text">智能匹配</text>
-    </view>
-    <view class="action-item">
-      <view class="action-icon">🗓️</view>
-      <text class="action-text">我的行程</text>
-    </view>
-    <view class="action-item">
-      <view class="action-icon">💬</view>
-      <text class="action-text">聊天</text>
+    <view class="welcome-text">
+      <text class="welcome-subtitle">欢迎回来！</text>
+      <text class="welcome-title">今天想和谁一起去旅行？✨</text>
     </view>
   </view>
 
-  <!-- 推荐旅伴 -->
-  <view class="section">
-    <view class="section-header">
-      <text class="section-title">为你推荐</text>
-      <text class="section-more">查看更多</text>
-    </view>
-
-    <view class="recommendations">
-      <view class="travel-mate-card" wx:for="{{recommendations}}" wx:key="id" bindtap="viewTravelMate" data-id="{{item.id}}">
-        <view class="mate-avatar">
-          <text>{{item.name.substring(0, 1)}}</text>
-        </view>
-        <view class="mate-info">
-          <view class="mate-header">
-            <text class="mate-name">{{item.name}} · {{item.age}}</text>
-            <view class="match-rate">{{item.matchRate}}%匹配</view>
-          </view>
-          <view class="mate-destination">📍 {{item.destination}}</view>
-          <view class="mate-date">📅 {{item.travelDate}}</view>
-          <view class="mate-tags">
-            <view class="tag" wx:for="{{item.tags}}" wx:key="*this" wx:for-item="tag">{{tag}}</view>
-          </view>
-        </view>
+  <!-- 心情选择区 - 白色卡片 -->
+  <view class="mood-section">
+    <text class="mood-title">你现在的心情是？</text>
+    <view class="mood-grid">
+      <view class="mood-item {{currentMood === 0 ? 'active' : ''}}" bindtap="selectMood" data-index="0">
+        <text class="mood-icon">😊</text>
+        <text class="mood-label">开心</text>
+      </view>
+      <view class="mood-item {{currentMood === 1 ? 'active' : ''}}" bindtap="selectMood" data-index="1">
+        <text class="mood-icon">😤</text>
+        <text class="mood-label">想释放</text>
+      </view>
+      <view class="mood-item {{currentMood === 2 ? 'active' : ''}}" bindtap="selectMood" data-index="2">
+        <text class="mood-icon">😴</text>
+        <text class="mood-label">想放松</text>
+      </view>
+      <view class="mood-item {{currentMood === 3 ? 'active' : ''}}" bindtap="selectMood" data-index="3">
+        <text class="mood-icon">🤩</text>
+        <text class="mood-label">想冒险</text>
       </view>
     </view>
   </view>
+
+  <!-- 行程分类摘要 - 横向滚动 -->
+  <view class="trip-summary">
+    <view class="trip-summary-card ongoing" bindtap="filterTrips" data-status="ongoing">
+      <text class="ts-emoji">🏕️</text>
+      <text class="ts-count">{{tripSummary.ongoing}}</text>
+      <text class="ts-label">进行中</text>
+    </view>
+    <view class="trip-summary-card upcoming" bindtap="filterTrips" data-status="upcoming">
+      <text class="ts-emoji">⏰</text>
+      <text class="ts-count">{{tripSummary.upcoming}}</text>
+      <text class="ts-label">即将开始</text>
+    </view>
+    <view class="trip-summary-card completed" bindtap="filterTrips" data-status="completed">
+      <text class="ts-emoji">✅</text>
+      <text class="ts-count">{{tripSummary.completed}}</text>
+      <text class="ts-label">已结束</text>
+    </view>
+  </view>
+
+  <!-- 筛选栏 - 横向滚动标签 -->
+  <view class="filter-bar">
+    <view class="filter-item {{activeFilter === 0 ? 'active' : ''}}" bindtap="selectFilter" data-index="0">全部</view>
+    <view class="filter-item {{activeFilter === 1 ? 'active' : ''}}" bindtap="selectFilter" data-index="1">🏔️ 户外</view>
+    <view class="filter-item {{activeFilter === 2 ? 'active' : ''}}" bindtap="selectFilter" data-index="2">🍜 美食</view>
+    <view class="filter-item {{activeFilter === 3 ? 'active' : ''}}" bindtap="selectFilter" data-index="3">📷 摄影</view>
+    <view class="filter-item {{activeFilter === 4 ? 'active' : ''}}" bindtap="selectFilter" data-index="4">🎢 乐园</view>
+    <view class="filter-item {{activeFilter === 5 ? 'active' : ''}}" bindtap="selectFilter" data-index="5">🏖️ 海滨</view>
+  </view>
+
+  <!-- 为你推荐标题 + 换一批 -->
+  <view class="section-title-row">
+    <text class="section-title">✨ 为你推荐</text>
+    <view class="refresh-btn" bindtap="refreshBuddies">
+      <text class="refresh-icon {{isRefreshing ? 'spinning' : ''}}">🔄</text>
+      <text>换一批</text>
+    </view>
+  </view>
+
+  <!-- 搭子卡片列表 -->
+  <view class="buddy-list">
+    <view class="buddy-card" wx:for="{{buddies}}" wx:key="id">
+
+      <!-- 卡片头部：距离 + 匹配度 -->
+      <view class="card-header">
+        <text class="card-distance">📍 {{item.distance}}</text>
+        <text class="card-match" bindtap="showMatchDetail" data-match="{{item.match}}">匹配度 {{item.match}}%</text>
+      </view>
+
+      <!-- 卡片主体：头像 + 信息 -->
+      <view class="card-main" bindtap="viewTravelMate" data-id="{{item.id}}">
+        <view class="avatar-wrapper">
+          <view class="buddy-avatar">
+            <text>{{item.name.substring(0, 1)}}</text>
+          </view>
+          <view class="verified" wx:if="{{item.verified}}">✓</view>
+        </view>
+        <view class="info">
+          <view class="name-row">
+            <text class="nickname">{{item.name}}</text>
+            <text class="age">{{item.age}}岁</text>
+            <text class="gender {{item.gender}}">{{item.gender === 'female' ? '♀' : '♂'}}</text>
+          </view>
+          <text class="signature">{{item.sig}}</text>
+        </view>
+      </view>
+
+      <!-- 标签 -->
+      <view class="tags">
+        <view class="chip {{item.tagClass}}" wx:for="{{item.tags}}" wx:key="*this" wx:for-item="tag">{{tag.text}}</view>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="card-actions">
+        <view class="action-btn btn-pass" bindtap="passBuddy" data-id="{{item.id}}">
+          <text class="btn-icon">✕</text>
+          <text>不感兴趣</text>
+        </view>
+        <view class="action-btn btn-like {{item.liked ? 'liked' : ''}}" bindtap="likeBuddy" data-id="{{item.id}}">
+          <text class="btn-icon">♥</text>
+          <text>{{item.liked ? '已喜欢' : '喜欢'}}</text>
+        </view>
+        <view class="action-btn btn-sayhi" bindtap="sayHi" data-id="{{item.id}}">
+          <text class="btn-icon">💬</text>
+          <text>打招呼</text>
+        </view>
+      </view>
+
+    </view>
+  </view>
+
 </view>

@@ -1,120 +1,241 @@
-.page { min-height: 100vh; background: var(--bg); }
+/* 行程页样式 */
+.page {
+  min-height: 100vh;
+  background: var(--bg);
+}
 
+/* ===== 内容区域 ===== */
+.content {
+  padding: 24rpx 32rpx;
+}
+
+/* ===== Tab 切换栏 ===== */
 .trip-tabs {
   display: flex;
-  background: var(--white);
-  padding: 20rpx 0;
+  background: var(--card-bg);
+  border-radius: 40rpx;
+  padding: 8rpx;
+  margin-bottom: 24rpx;
+  box-shadow: var(--shadow);
 }
 
 .tab-item {
   flex: 1;
   text-align: center;
-  padding: 16rpx;
+  padding: 16rpx 0;
   font-size: 28rpx;
   color: var(--text-secondary);
-  border-bottom: 4rpx solid transparent;
+  border-radius: 32rpx;
+  transition: all 0.2s;
 }
 
 .tab-item.active {
-  color: var(--primary);
-  border-bottom-color: var(--primary);
-  font-weight: 500;
+  background: var(--gradient-primary);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2rpx 8rpx rgba(163, 207, 255, 0.4);
 }
 
+/* ===== 发布按钮 ===== */
 .publish-btn {
-  margin: 20rpx 24rpx;
-  padding: 20rpx;
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  color: var(--white);
-  border-radius: 20rpx;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  margin-bottom: 24rpx;
+  padding: 28rpx 0;
+  background: var(--gradient-fresh);
+  border-radius: 40rpx;
+  box-shadow: var(--shadow);
+}
+
+.publish-btn:active {
+  transform: scale(0.98);
+}
+
+.publish-icon {
+  font-size: 40rpx;
+  color: white;
+  line-height: 1;
+}
+
+.publish-text {
   font-size: 30rpx;
+  font-weight: 600;
+  color: white;
 }
 
-.publish-btn .icon { font-size: 36rpx; margin-right: 8rpx; }
+/* ===== 行程列表 ===== */
+.trip-list {
+  padding-bottom: 40rpx;
+}
 
-.trip-list { padding: 0 24rpx 20rpx; }
-
+/* ===== 行程卡片 ===== */
 .trip-card {
-  background: var(--white);
-  border-radius: 20rpx;
-  padding: 24rpx;
-  margin-bottom: 16rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+  background: var(--card-bg);
+  border-radius: 48rpx;
+  overflow: hidden;
+  margin-bottom: 24rpx;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.trip-header {
+.trip-card:active {
+  transform: scale(0.99);
+  box-shadow: var(--shadow-hover);
+}
+
+/* 顶部渐变条 */
+.trip-card-header {
+  height: 12rpx;
+  background: var(--gradient-fresh);
+}
+
+.trip-card-body {
+  padding: 28rpx 32rpx;
+}
+
+/* 标题行 */
+.trip-title-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12rpx;
+  margin-bottom: 16rpx;
 }
 
-.trip-title { font-size: 30rpx; font-weight: 500; }
+.trip-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 状态标签 */
+.status-tag {
+  padding: 8rpx 24rpx;
+  border-radius: 32rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+
+.status-tag.tag-ongoing,
+.status-tag.enrolling {
+  background: rgba(184, 230, 208, 0.4);
+  color: #4CAF50;
+}
+
+.status-tag.tag-ended {
+  background: rgba(184, 176, 204, 0.3);
+  color: var(--text-secondary);
+}
 
 .status-tag {
-  padding: 4rpx 16rpx;
-  border-radius: 20rpx;
-  font-size: 22rpx;
-  background: rgba(0,230,118,0.1);
-  color: var(--accent-green);
+  /* 兼容旧代码的 statusClass */
+  background: rgba(184, 230, 208, 0.4);
+  color: #4CAF50;
 }
 
-.status-tag.enrolling {
-  background: rgba(0,180,255,0.1);
-  color: var(--secondary);
-}
-
+/* 路线信息 */
 .trip-route {
-  font-size: 26rpx;
-  color: var(--text-secondary);
-  margin-bottom: 12rpx;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: var(--text-primary);
 }
 
-.trip-route .arrow { margin: 0 12rpx; color: var(--primary); }
+.route-dep,
+.route-dest {
+  flex-shrink: 0;
+}
 
+.route-arrow {
+  margin: 0 20rpx;
+  color: #9575CD;
+  font-size: 36rpx;
+  flex-shrink: 0;
+}
+
+/* 元信息 */
 .trip-meta {
   display: flex;
+  flex-wrap: wrap;
   gap: 24rpx;
-  margin-bottom: 12rpx;
+  margin-bottom: 16rpx;
 }
 
 .meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
   font-size: 24rpx;
-  color: var(--text-light);
+  color: var(--text-secondary);
 }
 
-.trip-tags { margin-bottom: 16rpx; }
+.meta-icon {
+  font-size: 26rpx;
+  flex-shrink: 0;
+}
 
+/* 标签 */
+.trip-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.tag.tag-mint {
+  background: rgba(184, 230, 208, 0.4);
+  color: #66BB6A;
+}
+
+/* 底部 - 作者 + 加入按钮 */
 .trip-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 16rpx;
-  border-top: 1rpx solid #F0F0F0;
+  padding-top: 20rpx;
+  border-top: 1rpx dashed rgba(184, 176, 204, 0.4);
 }
 
 .author-info {
   display: flex;
   align-items: center;
-  gap: 12rpx;
-  font-size: 26rpx;
+  gap: 16rpx;
 }
 
-.author-avatar {
-  width: 56rpx;
-  height: 56rpx;
-  border-radius: 50%;
+.author-name {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .join-btn {
-  padding: 12rpx 32rpx;
-  background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
-  color: var(--white);
-  border-radius: 30rpx;
+  padding: 16rpx 36rpx;
+  background: var(--gradient-primary);
+  color: white;
+  border-radius: 40rpx;
   font-size: 26rpx;
+  font-weight: 500;
+  transition: transform 0.2s;
 }
 
+.join-btn:active {
+  transform: scale(0.95);
+}
+
+.join-btn.btn-warm {
+  background: linear-gradient(135deg, #FFB8A3, #FFE0A3);
+}
+
+/* ===== 空状态 ===== */
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -123,5 +244,17 @@
   color: var(--text-light);
 }
 
-.empty-icon { font-size: 80rpx; margin-bottom: 20rpx; }
-.empty-hint { font-size: 24rpx; margin-top: 12rpx; }
+.empty-icon {
+  font-size: 96rpx;
+  margin-bottom: 24rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  font-weight: 500;
+  margin-bottom: 12rpx;
+}
+
+.empty-hint {
+  font-size: 24rpx;
+}

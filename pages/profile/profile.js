@@ -10,10 +10,13 @@ Page({
       avatar: '',
       bio: '',
       tags: [],
+      city: '',
+      creditScore: 180,
       travelCount: 0,
-      matchCount: 0
-    },
-    isEditing: false
+      matchCount: 0,
+      rating: '95%',
+      unreadCount: 3
+    }
   },
 
   onLoad() {
@@ -25,84 +28,46 @@ Page({
     this.setData({ userInfo });
   },
 
-  // 进入编辑模式
-  editProfile() {
-    this.setData({ isEditing: true });
-  },
-
-  // 保存个人信息
-  saveProfile() {
-    // TODO: 保存到服务器
-    this.setData({ isEditing: false });
+  // 进入编辑资料页
+  goToEditProfile() {
     wx.showToast({
-      title: '保存成功',
-      icon: 'success'
+      title: '编辑资料',
+      icon: 'none'
     });
   },
 
-  // 修改昵称
-  onNameInput(e) {
-    this.setData({
-      'userInfo.name': e.detail.value
+  // 信用分详情
+  showCreditDetail() {
+    wx.showToast({
+      title: '信用分 ' + this.data.userInfo.creditScore + ' - 表现良好',
+      icon: 'none'
     });
   },
 
-  // 修改年龄
-  onAgeInput(e) {
-    this.setData({
-      'userInfo.age': parseInt(e.detail.value)
+  // 我的行程
+  goToMyTrips() {
+    wx.switchTab({
+      url: '/pages/trip/trip'
     });
   },
 
-  // 选择性别
-  selectGender() {
-    wx.showActionSheet({
-      itemList: ['男', '女', '其他'],
-      success: (res) => {
-        const genders = ['男', '女', '其他'];
-        this.setData({
-          'userInfo.gender': genders[res.tapIndex]
-        });
-      }
+  // 旅行日记
+  goToDiary() {
+    wx.showToast({
+      title: '功能开发中',
+      icon: 'none'
     });
   },
 
-  // 修改个人简介
-  onBioInput(e) {
-    this.setData({
-      'userInfo.bio': e.detail.value
+  // 消息通知
+  goToMessages() {
+    wx.switchTab({
+      url: '/pages/chat/chat'
     });
   },
 
-  // 添加标签
-  addTag() {
-    wx.showModal({
-      title: '添加标签',
-      editable: true,
-      success: (res) => {
-        if (res.confirm && res.content) {
-          const tags = this.data.userInfo.tags || [];
-          tags.push(res.content);
-          this.setData({
-            'userInfo.tags': tags
-          });
-        }
-      }
-    });
-  },
-
-  // 删除标签
-  deleteTag(e) {
-    const index = e.currentTarget.dataset.index;
-    const tags = this.data.userInfo.tags;
-    tags.splice(index, 1);
-    this.setData({
-      'userInfo.tags': tags
-    });
-  },
-
-  // 查看旅行记录
-  viewTravelHistory() {
+  // 收藏
+  goToFavorites() {
     wx.showToast({
       title: '功能开发中',
       icon: 'none'
@@ -113,6 +78,22 @@ Page({
   goToSettings() {
     wx.navigateTo({
       url: '/pages/settings/settings'
+    });
+  },
+
+  // 认识搭子
+  goToMyBuddies() {
+    wx.showToast({
+      title: '功能开发中',
+      icon: 'none'
+    });
+  },
+
+  // 好评率
+  showRating() {
+    wx.showToast({
+      title: '好评率 ' + this.data.userInfo.rating,
+      icon: 'none'
     });
   }
 });

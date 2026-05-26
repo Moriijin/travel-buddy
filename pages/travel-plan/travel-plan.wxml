@@ -1,48 +1,169 @@
-<!--pages/travel-plan/travel-plan.wxml-->
-<view class="container">
-  <!-- 头部 -->
-  <view class="header">
-    <text class="title">我的旅行计划</text>
-    <view class="create-btn" bindtap="createPlan">+ 新建</view>
-  </view>
+<!--pages/travel-plan/travel-plan.wxml 创建行程表单-->
+<view class="page-container">
 
-  <!-- 计划列表 -->
-  <view class="plan-list">
-    <view class="plan-card" wx:for="{{plans}}" wx:key="id" bindtap="viewPlanDetail" data-id="{{item.id}}">
-      <view class="plan-header">
-        <text class="plan-title">{{item.title}}</text>
-        <view class="plan-status status-{{item.status === '进行中' ? 'active' : 'pending'}}">{{item.status}}</view>
-      </view>
-      
-      <view class="plan-info">
-        <view class="info-item">
-          <text class="info-icon">📍</text>
-          <text class="info-text">{{item.destination}}</text>
-        </view>
-        <view class="info-item">
-          <text class="info-icon">📅</text>
-          <text class="info-text">{{item.startDate}} ~ {{item.endDate}}</text>
-        </view>
-        <view class="info-item">
-          <text class="info-icon">💰</text>
-          <text class="info-text">{{item.budget}}元/人</text>
-        </view>
-        <view class="info-item">
-          <text class="info-icon">👥</text>
-          <text class="info-text">{{item.participants}}/{{item.maxParticipants}} 人</text>
-        </view>
-      </view>
-
-      <view class="plan-actions">
-        <button class="btn-secondary" size="mini" bindtap="deletePlan" data-id="{{item.id}}">删除</button>
-      </view>
+  <!-- ===== 顶部渐变导航 ===== -->
+  <view class="header-wrapper">
+    <view class="status-bar-spacer"></view>
+    <view class="header">
+    <view class="header-left" bindtap="goBack">
+      <text class="back-icon">‹</text>
+    </view>
+    <text class="header-title">创建行程</text>
+    <view class="header-right">
+      <text class="publish-link" bindtap="handleSubmit">发布</text>
     </view>
   </view>
-
-  <!-- 空状态 -->
-  <view class="empty-state" wx:if="{{plans.length === 0}}">
-    <view class="empty-icon">🗺️</view>
-    <text class="empty-text">暂无旅行计划</text>
-    <button class="btn-primary" bindtap="createPlan">创建第一个计划</button>
   </view>
+
+  <!-- ===== 表单区域 ===== -->
+  <view class="form-area">
+
+    <!-- 行程名称 -->
+    <view class="form-group">
+      <text class="form-label">行程名称</text>
+      <input
+        class="form-input"
+        placeholder="给你的旅行起个好听的名字"
+        placeholder-class="input-placeholder"
+        value="{{tripName}}"
+        bindinput="onTripNameInput"
+        maxlength="30"
+      />
+    </view>
+
+    <!-- 出发地 / 目的地 -->
+    <view class="form-group">
+      <text class="form-label">行程路线</text>
+      <view class="dual-row">
+        <view class="dual-item">
+          <text class="dual-icon">🏠</text>
+          <input
+            class="dual-input"
+            placeholder="出发地"
+            placeholder-class="input-placeholder"
+            value="{{departure}}"
+            bindinput="onDepartureInput"
+          />
+        </view>
+        <view class="dual-separator">→</view>
+        <view class="dual-item">
+          <text class="dual-icon">📍</text>
+          <input
+            class="dual-input"
+            placeholder="目的地"
+            placeholder-class="input-placeholder"
+            value="{{destination}}"
+            bindinput="onDestinationInput"
+          />
+        </view>
+      </view>
+    </view>
+
+    <!-- 出发 / 返回日期 -->
+    <view class="form-group">
+      <text class="form-label">出行日期</text>
+      <view class="dual-row">
+        <picker
+          class="dual-picker"
+          mode="date"
+          start="{{minDate}}"
+          end="{{maxDate}}"
+          value="{{startDate}}"
+          bindchange="onStartDateChange"
+        >
+          <view class="dual-picker-item {{startDate ? '' : 'placeholder-style'}}">
+            <text class="dual-icon">📅</text>
+            <text>{{startDate || '出发日期'}}</text>
+          </view>
+        </picker>
+        <view class="dual-separator">~</view>
+        <picker
+          class="dual-picker"
+          mode="date"
+          start="{{minDate}}"
+          end="{{maxDate}}"
+          value="{{endDate}}"
+          bindchange="onEndDateChange"
+        >
+          <view class="dual-picker-item {{endDate ? '' : 'placeholder-style'}}">
+            <text class="dual-icon">📅</text>
+            <text>{{endDate || '返回日期'}}</text>
+          </view>
+        </picker>
+      </view>
+    </view>
+
+    <!-- 同行人数 / 预算范围 -->
+    <view class="form-group">
+      <text class="form-label">行程配置</text>
+      <view class="dual-row">
+        <picker
+          class="dual-picker"
+          range="{{travelerOptions}}"
+          value="{{travelerIndex}}"
+          bindchange="onTravelerChange"
+        >
+          <view class="dual-picker-item">
+            <text class="dual-icon">👥</text>
+            <text>{{travelerOptions[travelerIndex]}}</text>
+          </view>
+        </picker>
+        <view class="dual-separator">|</view>
+        <picker
+          class="dual-picker"
+          range="{{budgetOptions}}"
+          value="{{budgetIndex}}"
+          bindchange="onBudgetChange"
+        >
+          <view class="dual-picker-item">
+            <text class="dual-icon">💰</text>
+            <text>{{budgetOptions[budgetIndex]}}</text>
+          </view>
+        </picker>
+      </view>
+    </view>
+
+    <!-- 行程描述 -->
+    <view class="form-group">
+      <text class="form-label">行程描述</text>
+      <textarea
+        class="form-textarea"
+        placeholder="描述你的旅行计划、想做的事、期待的体验..."
+        placeholder-class="textarea-placeholder"
+        value="{{description}}"
+        bindinput="onDescriptionInput"
+        maxlength="500"
+        show-confirm-bar="{{false}}"
+      />
+      <view class="textarea-count">{{description.length}}/500</view>
+    </view>
+
+    <!-- 标签选择 -->
+    <view class="form-group">
+      <text class="form-label">旅行标签</text>
+      <scroll-view class="tag-scroll" scroll-x enable-flex>
+        <view class="tag-scroll-inner">
+          <view
+            wx:for="{{tags}}"
+            wx:key="id"
+            class="tag-chip {{item.selected ? 'tag-selected' : ''}} tag-color-{{item.id}}"
+            bindtap="toggleTag"
+            data-index="{{index}}"
+          >
+            <text>{{item.icon}} {{item.label}}</text>
+          </view>
+        </view>
+      </scroll-view>
+      <text class="tag-hint">选择感兴趣的旅行主题标签</text>
+    </view>
+
+  </view>
+
+  <!-- ===== 底部发布按钮 ===== -->
+  <view class="footer">
+    <button class="submit-btn" bindtap="handleSubmit" loading="{{isSubmitting}}">
+      ✨ 发布旅行计划
+    </button>
+  </view>
+
 </view>

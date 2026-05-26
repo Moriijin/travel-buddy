@@ -1,67 +1,105 @@
 <!-- 行程页 -->
 <view class="page">
-  <!-- Tab 切换 -->
-  <view class="trip-tabs">
-    <view class="tab-item {{activeTab === 'my' ? 'active' : ''}}" bindtap="switchTab" data-tab="my">我的行程</view>
-    <view class="tab-item {{activeTab === 'browse' ? 'active' : ''}}" bindtap="switchTab" data-tab="browse">发现行程</view>
+  <!-- 顶部导航 -->
+  <view class="header">
+    <text class="title">行程</text>
   </view>
 
-  <!-- 发布按钮 -->
-  <view class="publish-btn" bindtap="publishTrip" wx:if="{{activeTab === 'browse'}}">
-    <text class="icon">+</text>
-    <text>发布行程</text>
-  </view>
-
-  <!-- 我的行程 -->
-  <view class="trip-list" wx:if="{{activeTab === 'my'}}">
-    <view class="empty-state" wx:if="{{!hasMyTrips}}">
-      <text class="empty-icon">🏕️</text>
-      <text>还没有行程哦</text>
-      <text class="empty-hint">去发现精彩的旅程吧</text>
+  <view class="content">
+    <!-- Tab 切换栏 -->
+    <view class="trip-tabs">
+      <view class="tab-item {{activeTab === 'all' ? 'active' : ''}}" bindtap="switchTab" data-tab="all">全部</view>
+      <view class="tab-item {{activeTab === 'ongoing' ? 'active' : ''}}" bindtap="switchTab" data-tab="ongoing">进行中</view>
+      <view class="tab-item {{activeTab === 'ended' ? 'active' : ''}}" bindtap="switchTab" data-tab="ended">已结束</view>
     </view>
-    <view class="trip-card" wx:for="{{myTrips}}" wx:key="id" bindtap="viewTripDetail" data-id="{{item.id}}">
-      <view class="trip-header">
-        <text class="trip-title">{{item.title}}</text>
-        <text class="status-tag {{item.statusClass}}">{{item.status}}</text>
-      </view>
-      <view class="trip-route">
-        <text>{{item.departure}}</text>
-        <text class="arrow">→</text>
-        <text>{{item.destination}}</text>
-      </view>
-      <view class="trip-meta">
-        <text class="meta-item">📅 {{item.startTime}}</text>
-        <text class="meta-item">👥 {{item.currentPeople}}/{{item.maxPeople}}人</text>
-      </view>
-    </view>
-  </view>
 
-  <!-- 发现行程 -->
-  <view class="trip-list" wx:if="{{activeTab === 'browse'}}">
-    <view class="trip-card" wx:for="{{trips}}" wx:key="id" bindtap="viewTripDetail" data-id="{{item.id}}">
-      <view class="trip-header">
-        <text class="trip-title">{{item.title}}</text>
-        <text class="status-tag {{item.status === '报名中' ? 'enrolling' : ''}}">{{item.status}}</text>
+    <!-- 发布按钮 -->
+    <view class="publish-btn" bindtap="publishTrip">
+      <text class="publish-icon">＋</text>
+      <text class="publish-text">发布行程</text>
+    </view>
+
+    <!-- 我的行程 -->
+    <view class="trip-list" wx:if="{{activeTab === 'my'}}">
+      <view class="empty-state" wx:if="{{!hasMyTrips}}">
+        <text class="empty-icon">🏕️</text>
+        <text class="empty-text">还没有行程哦</text>
+        <text class="empty-hint">去发现精彩的旅程吧</text>
       </view>
-      <view class="trip-route">
-        <text>{{item.departure}}</text>
-        <text class="arrow">→</text>
-        <text>{{item.destination}}</text>
-      </view>
-      <view class="trip-meta">
-        <text class="meta-item">📅 {{item.startTime}}</text>
-        <text class="meta-item">💰 {{item.budget}}</text>
-      </view>
-      <view class="trip-tags">
-        <view class="tag tag-orange" wx:for="{{item.tags}}" wx:key="*this" wx:for-item="tag">{{tag}}</view>
-      </view>
-      <view class="trip-footer">
-        <view class="author-info">
-          <image class="author-avatar" src="{{item.author.avatar}}" mode="aspectFill" />
-          <text>{{item.author.nickname}}</text>
+      <view class="trip-card" wx:for="{{myTrips}}" wx:key="id" bindtap="viewTripDetail" data-id="{{item.id}}">
+        <!-- 顶部渐变条 -->
+        <view class="trip-card-header"></view>
+        <view class="trip-card-body">
+          <view class="trip-title-row">
+            <text class="trip-title">{{item.title}}</text>
+            <view class="status-tag {{item.statusClass}}">{{item.status}}</view>
+          </view>
+          <view class="trip-route">
+            <text class="route-dep">{{item.departure}}</text>
+            <text class="route-arrow">→</text>
+            <text class="route-dest">{{item.destination}}</text>
+          </view>
+          <view class="trip-meta">
+            <view class="meta-item">
+              <text class="meta-icon">📅</text>
+              <text>{{item.startTime}}</text>
+            </view>
+            <view class="meta-item">
+              <text class="meta-icon">👥</text>
+              <text>{{item.currentPeople}}/{{item.maxPeople}}人</text>
+            </view>
+          </view>
+          <view class="trip-footer">
+            <view class="author-info">
+              <view class="avatar avatar-xs">{{item.author.name}}</view>
+              <text class="author-name">{{item.author.nickname}}</text>
+            </view>
+            <view class="join-btn" catchtap="joinTrip" data-id="{{item.id}}">我要报名</view>
+          </view>
         </view>
-        <view class="join-btn" catchtap="joinTrip" data-id="{{item.id}}">
-          我要报名
+      </view>
+    </view>
+
+    <!-- 发现行程 -->
+    <view class="trip-list" wx:if="{{activeTab !== 'my'}}">
+      <view class="trip-card" wx:for="{{trips}}" wx:key="id">
+        <!-- 顶部渐变条 -->
+        <view class="trip-card-header"></view>
+        <view class="trip-card-body">
+          <view class="trip-title-row">
+            <text class="trip-title">{{item.title}}</text>
+            <view class="status-tag {{item.status === '报名中' ? 'tag-ongoing' : 'tag-ended'}}">{{item.status}}</view>
+          </view>
+          <view class="trip-route">
+            <text class="route-dep">{{item.departure}}</text>
+            <text class="route-arrow">→</text>
+            <text class="route-dest">{{item.destination}}</text>
+          </view>
+          <view class="trip-meta">
+            <view class="meta-item">
+              <text class="meta-icon">📅</text>
+              <text>{{item.startTime}}</text>
+            </view>
+            <view class="meta-item">
+              <text class="meta-icon">👥</text>
+              <text>{{item.currentPeople}}/{{item.maxPeople}}人</text>
+            </view>
+            <view class="meta-item">
+              <text class="meta-icon">💰</text>
+              <text>{{item.budget}}</text>
+            </view>
+          </view>
+          <view class="trip-tags" wx:if="{{item.tags}}">
+            <view class="tag tag-mint" wx:for="{{item.tags}}" wx:key="*this" wx:for-item="tag">{{tag}}</view>
+          </view>
+          <view class="trip-footer">
+            <view class="author-info">
+              <image class="avatar avatar-xs" src="{{item.author.avatar}}" mode="aspectFill" />
+              <text class="author-name">{{item.author.nickname}}</text>
+            </view>
+            <view class="join-btn" bindtap="viewTripDetail" data-id="{{item.id}}" wx:if="{{!item.joined}}">查看详情</view>
+            <view class="join-btn btn-warm" catchtap="joinTrip" data-id="{{item.id}}" wx:if="{{item.joined === undefined}}">我要报名</view>
+          </view>
         </view>
       </view>
     </view>

@@ -1,53 +1,69 @@
 <!-- 发现页 - 筛选匹配 & 热门话题 -->
 <view class="page">
-  <!-- 搜索栏 -->
-  <view class="search-bar">
-    <text class="icon">🔍</text>
-    <input class="search-input" placeholder="搜索目的地、话题、搭子..." bindinput="onSearch" />
+  <!-- 顶部导航 -->
+  <view class="header">
+    <text class="title">发现</text>
   </view>
 
-  <!-- 筛选条件 -->
-  <view class="filter-panel">
-    <view class="filter-section">
-      <text class="section-title">距离</text>
-      <view class="filter-options">
-        <view class="filter-chip {{filters.distance === item ? 'active' : ''}}" wx:for="{{distanceOptions}}" wx:key="value" bindtap="setFilter" data-type="distance" data-value="{{item}}">
-          {{item}}
+  <view class="content">
+    <!-- 搜索栏 -->
+    <view class="search-bar">
+      <text class="search-icon">🔍</text>
+      <input class="search-input" placeholder="搜索目的地、话题、搭子..." bindinput="onSearch" />
+    </view>
+
+    <!-- 筛选面板 -->
+    <view class="filter-panel">
+      <view class="filter-section">
+        <text class="filter-label">目的地</text>
+        <view class="filter-options">
+          <view class="chip {{filters.destination === item ? 'chip-active' : 'chip-default'}}"
+                wx:for="{{destinations}}" wx:key="value"
+                bindtap="setFilter" data-type="destination" data-value="{{item}}">
+            {{item}}
+          </view>
+        </view>
+      </view>
+
+      <view class="filter-section">
+        <text class="filter-label">时间</text>
+        <view class="filter-options">
+          <view class="chip {{filters.time === item ? 'chip-active' : 'chip-default'}}"
+                wx:for="{{timeOptions}}" wx:key="value"
+                bindtap="setFilter" data-type="time" data-value="{{item}}">
+            {{item}}
+          </view>
+        </view>
+      </view>
+
+      <view class="filter-section">
+        <text class="filter-label">同行人数</text>
+        <view class="filter-options">
+          <view class="chip {{filters.people === item ? 'chip-active' : 'chip-default'}}"
+                wx:for="{{peopleOptions}}" wx:key="value"
+                bindtap="setFilter" data-type="people" data-value="{{item}}">
+            {{item}}
+          </view>
         </view>
       </view>
     </view>
 
-    <view class="filter-section">
-      <text class="section-title">出行类型</text>
-      <view class="filter-options">
-        <view class="filter-chip {{filters.tripType === item ? 'active' : ''}}" wx:for="{{tripTypes}}" wx:key="value" bindtap="setFilter" data-type="tripType" data-value="{{item}}">
-          {{item}}
+    <!-- 热门话题 -->
+    <view class="topics-section">
+      <view class="section-header">
+        <view class="section-title-row">
+          <text class="section-title">🔥 热门话题</text>
         </view>
+        <text class="more" bindtap="viewAllTopics">查看全部</text>
       </view>
-    </view>
-
-    <view class="filter-section">
-      <text class="section-title">兴趣偏好</text>
-      <view class="filter-options">
-        <view class="filter-chip {{filters.interest === item ? 'active' : ''}}" wx:for="{{interests}}" wx:key="value" bindtap="setFilter" data-type="interest" data-value="{{item}}">
-          {{item}}
-        </view>
-      </view>
-    </view>
-  </view>
-
-  <!-- 热门话题 -->
-  <view class="topics-section">
-    <view class="section-header">
-      <text class="section-title">🔥 热门话题</text>
-      <text class="more" bindtap="viewAllTopics">查看全部</text>
-    </view>
-    <view class="topic-list">
-      <view class="topic-card" wx:for="{{topics}}" wx:key="id" bindtap="viewTopic" data-id="{{item.id}}">
-        <image class="topic-img" src="{{item.avatar}}" mode="aspectFill" />
-        <view class="topic-info">
-          <text class="topic-title">{{item.title}}</text>
-          <text class="topic-posts">{{item.posts}} 篇帖子</text>
+      <view class="topic-list">
+        <view class="topic-card" wx:for="{{topics}}" wx:key="id" bindtap="viewTopic" data-id="{{item.id}}">
+          <image class="topic-img" src="{{item.avatar}}" mode="aspectFill" />
+          <view class="topic-info">
+            <text class="topic-title">{{item.title}}</text>
+            <text class="topic-posts">{{item.posts}} 篇帖子</text>
+          </view>
+          <text class="topic-arrow">›</text>
         </view>
       </view>
     </view>

@@ -1,52 +1,108 @@
 <!--pages/match/match.wxml-->
-<view class="container">
-  <!-- 筛选条件 -->
-  <view class="filters card">
-    <view class="filter-item" bindtap="selectDestination">
-      <text class="filter-label">目的地</text>
-      <text class="filter-value">{{filters.destination || '选择目的地'}}</text>
-    </view>
-    <view class="filter-item" bindtap="selectTravelDate">
-      <text class="filter-label">出行时间</text>
-      <text class="filter-value">{{filters.travelDate || '选择时间'}}</text>
-    </view>
+<view class="page-match">
+  <!-- 顶部导航 - 紫色渐变 -->
+  <view class="header">
+    <text class="icon-btn">☰</text>
+    <text class="title">发现旅伴</text>
+    <text class="icon-btn" bindtap="openFilters">⚙</text>
   </view>
 
-  <!-- 匹配区域 -->
-  <view class="match-area">
-    <view class="candidate-card" wx:if="{{currentCandidate && !isMatching}}">
-      <view class="candidate-avatar">
-        <text>{{currentCandidate.name.substring(0, 1)}}</text>
+  <scroll-view class="scroll-content" scroll-y enhanced>
+    <!-- 筛选条件 -->
+    <view class="filters card">
+      <view class="filter-item" bindtap="selectDestination">
+        <text class="filter-label">目的地</text>
+        <text class="filter-value">{{filters.destination || '选择目的地'}}</text>
+        <text class="filter-arrow">›</text>
       </view>
-      <view class="candidate-info">
-        <view class="candidate-header">
-          <text class="candidate-name">{{currentCandidate.name}}</text>
-          <view class="match-score">{{currentCandidate.matchScore}}%匹配</view>
-        </view>
-        <view class="candidate-detail">📍 {{currentCandidate.destination}}</view>
-        <view class="candidate-detail">📅 {{currentCandidate.travelDate}}</view>
-        <view class="candidate-detail">🏷️ {{currentCandidate.gender}}</view>
-        <view class="candidate-bio">{{currentCandidate.bio}}</view>
-        <view class="candidate-tags">
-          <view class="tag" wx:for="{{currentCandidate.interests}}" wx:key="*this">{{item}}</view>
-        </view>
+      <view class="filter-item" bindtap="selectTravelDate">
+        <text class="filter-label">出行时间</text>
+        <text class="filter-value">{{filters.travelDate || '选择时间'}}</text>
+        <text class="filter-arrow">›</text>
       </view>
     </view>
 
-    <!-- 匹配中状态 -->
-    <view class="matching-status" wx:if="{{isMatching}}">
-      <view class="loading-spinner">🔍</view>
-      <text class="matching-text">正在为你匹配最佳旅伴...</text>
+    <!-- 匹配卡片区域 -->
+    <view class="match-area">
+      <!-- Buddy Card -->
+      <view class="buddy-card" wx:if="{{currentCandidate && !isMatching}}">
+        <!-- 顶部渐变条 -->
+        <view class="card-gradient-top"></view>
+
+        <!-- 头像 + 认证标记 + 基础信息 -->
+        <view class="card-top">
+          <view class="avatar-wrapper">
+            <view class="avatar avatar-lg" style="background: {{currentCandidate.avatarColor}}">
+              <text class="avatar-text">{{currentCandidate.name.substring(0, 1)}}</text>
+            </view>
+            <view class="verified" wx:if="{{currentCandidate.verified}}">✓</view>
+          </view>
+          <view class="card-identity">
+            <view class="identity-row">
+              <text class="nickname">{{currentCandidate.name}}</text>
+              <text class="age">{{currentCandidate.age}}岁</text>
+              <text class="gender">{{currentCandidate.gender}}</text>
+            </view>
+            <view class="match-score-badge">
+              <text class="score-text">{{currentCandidate.matchScore}}% 匹配</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 签名 -->
+        <view class="card-bio">{{currentCandidate.bio}}</view>
+
+        <!-- 行程信息 -->
+        <view class="trip-info">
+          <view class="trip-item">
+            <text class="trip-icon">📍</text>
+            <text class="trip-text">{{currentCandidate.destination}}</text>
+          </view>
+          <view class="trip-item">
+            <text class="trip-icon">📅</text>
+            <text class="trip-text">{{currentCandidate.travelDate}}</text>
+          </view>
+        </view>
+
+        <!-- 彩色标签 -->
+        <view class="candidate-tags">
+          <view class="tag tag-color-{{idx}}" wx:for="{{currentCandidate.interests}}" wx:for-index="idx" wx:key="*this">{{item}}</view>
+        </view>
+      </view>
+
+      <!-- 匹配中状态 -->
+      <view class="matching-status" wx:if="{{isMatching}}">
+        <view class="loading-spinner">
+          <view class="spinner-ring"></view>
+          <view class="spinner-dot"></view>
+        </view>
+        <text class="matching-text">正在为你匹配最佳旅伴...</text>
+        <text class="matching-hint">根据你的偏好和出行计划</text>
+      </view>
+
+      <!-- 无匹配状态 -->
+      <view class="empty-state" wx:if="{{!currentCandidate && !isMatching}}">
+        <view class="empty-icon">🌟</view>
+        <text class="empty-title">还没有匹配的旅伴</text>
+        <text class="empty-desc">设置筛选条件后开始匹配吧</text>
+        <button class="btn-start-match" bindtap="startMatching">开始匹配</button>
+      </view>
     </view>
 
     <!-- 操作按钮 -->
     <view class="action-buttons" wx:if="{{currentCandidate && !isMatching}}">
-      <button class="btn-skip" bindtap="skipCandidate">跳过</button>
-      <button class="btn-like" bindtap="likeCandidate">喜欢</button>
-      <button class="btn-details" bindtap="viewDetails">详情</button>
+      <view class="action-btn skip-btn" bindtap="skipCandidate">
+        <text class="btn-icon">✕</text>
+        <text class="btn-text">跳过</text>
+      </view>
+      <view class="action-btn like-btn" bindtap="likeCandidate">
+        <text class="btn-icon">♥</text>
+        <text class="btn-text">喜欢</text>
+      </view>
+      <view class="action-btn greet-btn" bindtap="greetCandidate">
+        <text class="btn-icon">💬</text>
+        <text class="btn-text">打招呼</text>
+      </view>
     </view>
-  </view>
-
-  <!-- 开始匹配按钮 -->
-  <button class="btn-start-match" bindtap="startMatching" wx:if="{{!currentCandidate && !isMatching}}">开始匹配</button>
+  </scroll-view>
 </view>

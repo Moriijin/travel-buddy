@@ -1,75 +1,75 @@
 <!--pages/profile/profile.wxml-->
 <view class="container">
-  <!-- 头像和基本信息 -->
-  <view class="profile-header">
+  <!-- 用户资料头部 - 渐变紫色背景 -->
+  <view class="profile-header" bindtap="goToEditProfile">
     <view class="avatar-wrapper">
       <view class="avatar">
         <text wx:if="{{userInfo.name}}">{{userInfo.name.substring(0, 1)}}</text>
         <text wx:else>我</text>
       </view>
-      <view class="edit-avatar-btn" wx:if="{{isEditing}}">✏️</view>
     </view>
-    <view class="basic-info">
-      <input wx:if="{{isEditing}}" class="name-input" value="{{userInfo.name}}" bindinput="onNameInput" placeholder="请输入昵称" />
-      <text wx:else class="name">{{userInfo.name || '未设置昵称'}}</text>
-      
-      <view class="age-gender">
-        <input wx:if="{{isEditing}}" class="age-input" type="number" value="{{userInfo.age}}" bindinput="onAgeInput" placeholder="年龄" />
-        <text wx:else class="age">{{userInfo.age ? userInfo.age + '岁' : ''}}</text>
-        
-        <view class="gender" bindtap="selectGender">
-          {{userInfo.gender || '选择性别'}}
-        </view>
-      </view>
+    <view class="nickname">{{userInfo.name || '旅行小达人'}}</view>
+    <view class="city">📍 {{userInfo.city || '北京'}}</view>
+  </view>
+
+  <!-- 信用分卡片 -->
+  <view class="credit-card" bindtap="showCreditDetail">
+    <view class="credit-header">
+      <text class="credit-label">信用分</text>
+      <text class="credit-score">{{userInfo.creditScore || 180}}</text>
+    </view>
+    <view class="credit-bar">
+      <view class="credit-fill" style="width: {{(userInfo.creditScore || 180) / 300 * 100}}%"></view>
     </view>
   </view>
 
-  <!-- 个人简介 -->
-  <view class="card">
-    <view class="card-header">
-      <text class="card-title">个人简介</text>
-      <text class="card-edit" wx:if="{{!isEditing}}" bindtap="editProfile">编辑</text>
+  <!-- 统计卡片行 -->
+  <view class="stats-row">
+    <view class="stat-mini" bindtap="goToMyTrips">
+      <text class="stat-label">👣 行程数</text>
+      <text class="stat-value">{{userInfo.travelCount || 4}}</text>
     </view>
-    <textarea wx:if="{{isEditing}}" class="bio-textarea" value="{{userInfo.bio}}" bindinput="onBioInput" placeholder="介绍一下自己吧..." />
-    <text wx:else class="bio-text">{{userInfo.bio || '暂无简介'}}</text>
-  </view>
-
-  <!-- 旅行标签 -->
-  <view class="card">
-    <view class="card-header">
-      <text class="card-title">旅行偏好</text>
-      <view class="add-tag-btn" wx:if="{{isEditing}}" bindtap="addTag">+ 添加</view>
+    <view class="stat-mini" bindtap="goToMyBuddies">
+      <text class="stat-label">👥 认识搭子</text>
+      <text class="stat-value">{{userInfo.matchCount || 8}}</text>
     </view>
-    <view class="tags-container">
-      <view class="tag" wx:for="{{userInfo.tags}}" wx:key="*this">
-        <text>{{item}}</text>
-        <text class="delete-tag" wx:if="{{isEditing}}" bindtap="deleteTag" data-index="{{index}}">×</text>
-      </view>
+    <view class="stat-mini" bindtap="showRating">
+      <text class="stat-label">⭐ 好评率</text>
+      <text class="stat-value">{{userInfo.rating || '95%'}}</text>
     </view>
   </view>
 
-  <!-- 数据统计 -->
-  <view class="card stats-card">
-    <view class="stat-item">
-      <text class="stat-number">{{userInfo.travelCount || 0}}</text>
-      <text class="stat-label">旅行次数</text>
+  <!-- 菜单组1: 主要功能 -->
+  <view class="menu-section">
+    <view class="menu-item" bindtap="goToMyTrips">
+      <text class="menu-icon">🏕️</text>
+      <text class="menu-text">我的行程</text>
+      <text class="menu-arrow">›</text>
     </view>
-    <view class="stat-divider"></view>
-    <view class="stat-item">
-      <text class="stat-number">{{userInfo.matchCount || 0}}</text>
-      <text class="stat-label">匹配成功</text>
+    <view class="menu-item" bindtap="goToDiary">
+      <text class="menu-icon">📝</text>
+      <text class="menu-text">旅行日记</text>
+      <text class="menu-arrow">›</text>
     </view>
-    <view class="stat-divider"></view>
-    <view class="stat-item" bindtap="viewTravelHistory">
-      <text class="stat-icon">📜</text>
-      <text class="stat-label">旅行记录</text>
+    <view class="menu-item" bindtap="goToMessages">
+      <text class="menu-icon">🔔</text>
+      <text class="menu-text">消息通知</text>
+      <view class="item-badge" wx:if="{{userInfo.unreadCount > 0}}">{{userInfo.unreadCount}}</view>
+      <text class="menu-arrow">›</text>
     </view>
   </view>
 
-  <!-- 操作按钮 -->
-  <view class="actions">
-    <button class="btn-primary" wx:if="{{isEditing}}" bindtap="saveProfile">保存修改</button>
-    <button class="btn-secondary" wx:else bindtap="editProfile">编辑资料</button>
-    <button class="btn-link" bindtap="goToSettings">设置</button>
+  <!-- 菜单组2: 其他功能 -->
+  <view class="menu-section">
+    <view class="menu-item" bindtap="goToFavorites">
+      <text class="menu-icon">⭐</text>
+      <text class="menu-text">收藏</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="goToSettings">
+      <text class="menu-icon">⚙️</text>
+      <text class="menu-text">设置</text>
+      <text class="menu-arrow">›</text>
+    </view>
   </view>
 </view>

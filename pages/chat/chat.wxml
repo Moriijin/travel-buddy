@@ -1,19 +1,36 @@
 <!--pages/chat/chat.wxml-->
-<view class="container">
+<view class="page-chat">
   <!-- 对话列表 -->
-  <view wx:if="{{!currentChatId}}" class="conversation-list">
-    <view class="conversation-item" wx:for="{{conversations}}" wx:key="id" bindtap="enterChat" data-id="{{item.id}}">
-      <view class="conv-avatar">
-        <text>{{item.name.substring(0, 1)}}</text>
-      </view>
-      <view class="conv-info">
-        <view class="conv-header">
-          <text class="conv-name">{{item.name}}</text>
-          <text class="conv-time">{{item.time}}</text>
+  <view wx:if="{{!currentChatId}}" class="chat-list-view">
+    <!-- 顶部导航 -->
+    <view class="header">
+      <text class="title">消息</text>
+      <text class="icon-btn">✎</text>
+    </view>
+
+    <!-- 对话列表 -->
+    <view class="conversation-list">
+      <view class="conversation-item"
+            wx:for="{{conversations}}"
+            wx:key="id"
+            bindtap="enterChat"
+            data-id="{{item.id}}">
+        <view class="avatar-wrapper">
+          <view class="avatar" style="background: {{item.avatarColor}}">
+            <text class="avatar-text">{{item.name.substring(0, 1)}}</text>
+          </view>
+          <view class="online-dot" wx:if="{{item.online}}"></view>
         </view>
-        <view class="conv-last-message">
-          <text>{{item.lastMessage}}</text>
-          <view class="unread-badge" wx:if="{{item.unread > 0}}">{{item.unread}}</view>
+        <view class="conv-info">
+          <view class="conv-header">
+            <text class="conv-name">{{item.name}}</text>
+            <text class="conv-time">{{item.time}}</text>
+          </view>
+          <view class="conv-last-message">
+            <text class="last-msg-text" wx:if="{{item.isSelf}}">我：{{item.lastMessage}}</text>
+            <text class="last-msg-text" wx:else>{{item.lastMessage}}</text>
+            <view class="unread-badge" wx:if="{{item.unread > 0}}">{{item.unread}}</view>
+          </view>
         </view>
       </view>
     </view>
@@ -23,24 +40,63 @@
   <view wx:else class="chat-window">
     <!-- 聊天头部 -->
     <view class="chat-header">
-      <view class="back-btn" bindtap="backToConversations">←</view>
-      <text class="chat-title">{{conversations[0].name}}</text>
+      <view class="back-btn" bindtap="backToConversations">‹</view>
+      <view class="chat-title-area">
+        <text class="chat-title">{{currentChatName}}</text>
+        <text class="chat-status" wx:if="{{currentChatOnline}}">在线</text>
+      </view>
+      <text class="icon-btn header-more">⋯</text>
     </view>
 
     <!-- 消息列表 -->
-    <scroll-view class="message-list" scroll-y scroll-into-view="{{scrollToBottom}}">
-      <view class="message-item {{item.isSelf ? 'self' : 'other'}}" wx:for="{{messages}}" wx:key="id" id="msg-{{item.id}}">
-        <view class="message-bubble">
+    <scroll-view class="message-list"
+                 scroll-y
+                 scroll-into-view="{{scrollToBottom}}"
+                 scroll-with-animation>
+      <view class="message-date" wx:if="{{messages.length > 0}}">
+        <text>今天</text>
+      </view>
+
+      <view class="message-item {{item.isSelf ? 'self' : 'other'}}"
+            wx:for="{{messages}}"
+            wx:key="id"
+            id="msg-{{item.id}}">
+        <!-- 对方头像 -->
+        <view class="msg-avatar other-avatar" wx:if="{{!item.isSelf}}"
+              style="background: {{currentChatAvatarColor}}">
+          <text class="avatar-text-sm">{{currentChatName.substring(0, 1)}}</text>
+        </view>
+
+        <view class="message-bubble {{item.isSelf ? 'self' : 'other'}}">
           <text class="message-content">{{item.content}}</text>
+          <view class="bubble-tail {{item.isSelf ? 'self' : 'other'}}"></view>
           <text class="message-time">{{item.time}}</text>
+        </view>
+
+        <!-- 自己头像 -->
+        <view class="msg-avatar self-avatar" wx:if="{{item.isSelf}}">
+          <text class="avatar-text-sm">我</text>
         </view>
       </view>
     </scroll-view>
 
-    <!-- 输入框 -->
-    <view class="chat-input">
-      <input class="input-field" value="{{inputValue}}" bindinput="onInputChange" placeholder="输入消息..." confirm-type="send" bindconfirm="sendMessage" />
-      <button class="send-btn" bindtap="sendMessage">发送</button>
+    <!-- 输入栏 -->
+    <view class="chat-input-bar">
+      <view class="input-extras">
+        <text class="extra-btn">+</text>
+      </view>
+      <view class="input-wrapper">
+        <input class="input-field"
+               value="{{inputValue}}"
+               bindinput="onInputChange"
+               placeholder="说点什么..."
+               confirm-type="send"
+               bindconfirm="sendMessage" />
+      </view>
+      <view class="send-btn {{inputValue.trim() ? 'active' : ''}}"
+            bindtap="sendMessage">
+        <text class="send-icon">↑</text>
+      </view>
     </view>
   </view>
 </view>
